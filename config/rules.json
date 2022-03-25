@@ -1,0 +1,81 @@
+[
+  {
+    "code": "GLOBAL_CLEANSING",
+    "rules": [
+      {
+        "code": "Trimming",
+        "name": "Remove spaces at the beginning and end of the product name",
+        "trigger": "true",
+        "strategy": "REGEX",
+        "regex": "value.trim()"
+      },
+      {
+        "code": "double_spacing",
+        "name": "Remove double spacing e.g. '    ' with ' '",
+        "trigger": "true",
+        "strategy": "REGEX",
+        "regex": "value.replaceAll('[\\s]+', ' ')"
+      },
+      {
+        "code": "remove_ending",
+        "name": "Remove endings like '(', '-'",
+        "trigger": "true",
+        "strategy": "REGEX",
+        "regex": "value.replaceAll('[-]$', ' ')"
+      },
+      {
+        "code": "Trimming",
+        "trigger": "true",
+        "strategy": "REGEX",
+        "regex": "value.trim()"
+      },
+      {
+        "code": "Word replacements",
+        "trigger": "true",
+        "strategy": "SYNONYMS",
+        "files": [
+          {
+            "type": "WORD",
+            "file": "keywords.csv"
+          }]
+      },
+      {
+        "code": "Sentences Replacements",
+        "trigger": "true",
+        "strategy": "SYNONYMS",
+        "files": [
+          {
+            "type": "SENTENCE",
+            "revert": true,
+            "file": "sentences.csv"
+          }]
+      },
+      {
+        "code": "Tokenize fixed_names.csv",
+        "trigger": "true",
+        "strategy": "TOKENIZE",
+        "files": [
+          {
+            "type": "WORD",
+            "file": "keywords.csv"
+          },
+          {
+            "type": "FIXED_NAME",
+            "file": "fixed_names.csv"
+          },
+          {
+            "type": "SENTENCE",
+            "revert": true,
+            "file": "sentences.csv"
+          }
+        ]
+      },
+      {
+        "code": "Proper Casing",
+        "trigger": "true",
+        "strategy": "REGEX",
+        "regex": "value.trim()"
+      }
+    ]
+  }
+]
