@@ -35,8 +35,7 @@
         "strategy": "SYNONYMS",
         "files": [
           {
-            "type": "WORD",
-            "file": "keywords.csv"
+            "type": "WORD"
           }]
       },
       {
@@ -46,27 +45,23 @@
         "files": [
           {
             "type": "SENTENCE",
-            "revert": true,
-            "file": "sentences.csv"
+            "revert": true
           }]
       },
       {
-        "code": "Tokenize fixed_names.csv",
+        "code": "Tokenize fixed_names",
         "trigger": "true",
         "strategy": "TOKENIZE",
         "files": [
           {
-            "type": "WORD",
-            "file": "keywords.csv"
+            "type": "WORD"
           },
           {
-            "type": "FIXED_NAME",
-            "file": "fixed_names.csv"
+            "type": "FIXED_NAME"
           },
           {
             "type": "SENTENCE",
-            "revert": true,
-            "file": "sentences.csv"
+            "revert": true
           }
         ]
       },
