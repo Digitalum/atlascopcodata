@@ -4,6 +4,7 @@
     <meta charset="UTF-8"/>
     <title>Spring Boot Thymeleaf Application - Bootstrap Pagination</title>
 
+    <link rel="stylesheet" href="/content/main.css"/>
     <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css}"/>
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
@@ -14,6 +15,11 @@
             });
         });
     </script>
+    <style>
+        span.example {
+            color:grey
+        }
+    </style>
 </head>
 <body>
 
@@ -56,16 +62,20 @@
                             Preprocessing
                             <ol>
                                 <li>
-                                    Trim
+                                    Trim : <span class="example">' X____WATER ( ' -> 'X____WATER ('</span>
                                 </li>
                                 <li>
-                                    Remove double spaces
+                                    Remove underderscores : <span class="example">'X____WATER (' -> 'X&nbsp;&nbsp;&nbsp;&nbsp;WATER ('</span>
                                 </li>
                                 <li>
-                                    Remove odd characters at the end.
+                                    Remove double spaces : <span class="example">'X&nbsp;&nbsp;&nbsp;&nbsp;WATER (' -> 'X WATER ('</span>
                                 </li>
                                 <li>
-                                    Trim
+                                    Remove odd characters at the end. : <span
+                                        class="example"> 'X WATER (' -> 'X WATER '</span>
+                                </li>
+                                <li>
+                                    Trim : <span class="example">'X WATER (' -> 'X WATER'</span>
                                 </li>
                                 <li>
                                     Word Replacements / Synonyms
@@ -73,7 +83,9 @@
                             </ol>
                         </li>
                         <li>
-                            Tokenize
+                            Tokenize : 'X WATER' ->
+                            <div class="keyword UNDEFINED_ABBR">X</div>
+                            <div class="keyword UNDEFINED_ABBR">WATER</div>
                         </li>
                         <li>
                             Translate

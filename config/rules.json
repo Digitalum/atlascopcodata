@@ -10,6 +10,13 @@
         "regex": "value.trim()"
       },
       {
+        "code": "underscore",
+        "name": "Remove double spacing e.g. '    ' with ' '",
+        "trigger": "true",
+        "strategy": "REGEX",
+        "regex": "value.replaceAll('[_]+', ' ')"
+      },
+      {
         "code": "double_spacing",
         "name": "Remove double spacing e.g. '    ' with ' '",
         "trigger": "true",
