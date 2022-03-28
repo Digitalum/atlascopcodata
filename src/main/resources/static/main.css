@@ -10,6 +10,10 @@
     margin-bottom: 12px; /* Add some space below the input */
 }
 
+body table td, body .table th {
+    padding: 0.15rem !important;
+}
+
 #myTable {
     border-collapse: collapse; /* Collapse borders */
     width: 100%; /* Full-width */
@@ -55,6 +59,7 @@ div.keyword a {
     text-decoration: none;
     font-family: arial;
     color: white;
+    font-size: 7pt;
 }
 
 div.keyword.UNDEFINED {
@@ -74,4 +79,21 @@ div.keyword.SENTENCE {
 }
 div.keyword.FIXED_NAME {
     background-color: #ae9187;
+}
+
+div.keywordwrapper {
+    background-color: blue;
+    display: inline-block;
+    border-radius: 5px;
+    padding: 3px;
+    color: white;
+    cursor: pointer;
+}
+
+div.keywordwrapper:after {
+    content: ' (+) '
+}
+
+span.addkeyword {
+    cursor: pointer;
 }

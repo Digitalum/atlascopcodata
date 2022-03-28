@@ -14,5 +14,5 @@ import java.util.List;
 @Repository
 public interface TokenRepository extends JpaRepository<Token, String> {
 
-    List<Token> findAllByType(String type);
+    List<Token> findAllByType(Token.TokenType type);
 }

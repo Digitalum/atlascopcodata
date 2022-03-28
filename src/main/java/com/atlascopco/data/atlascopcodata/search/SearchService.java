@@ -4,6 +4,7 @@
 package com.atlascopco.data.atlascopcodata.search;
 
 
+import com.atlascopco.data.atlascopcodata.model.Token;
 import com.atlascopco.data.atlascopcodata.search.search.SearchFacet;
 import com.atlascopco.data.atlascopcodata.search.search.SearchFacetValue;
 import com.atlascopco.data.atlascopcodata.search.search.SearchRequest;
@@ -81,6 +82,29 @@ public class SearchService implements ApplicationListener<ApplicationReadyEvent>
         return response;
     }
 
+    private BooleanJunction addFreeTextSearch(SearchRequest request, QueryBuilder queryBuilder, BooleanJunction bool) {
+        if (org.apache.commons.lang3.StringUtils.isEmpty(request.getQuery())) {
+            return bool;
+        }
+        if (Token.class.equals(request.getEntity())) {
+            if (!StringUtils.isEmpty(request.getQuery())) {
+                Query query = queryBuilder
+                        .simpleQueryString()
+                        .onFields("code")
+                        .boostedTo(2f).matching(request.getQuery().toLowerCase()).createQuery();
+                bool = bool.must(query);
+            }
+            return bool;
+        } else {
+            Query query = queryBuilder
+                    .simpleQueryString()
+                    .onFields("code")
+                    .boostedTo(2f).matching(request.getQuery().toLowerCase()).createQuery();
+            bool = bool.must(query);
+            return bool;
+        }
+    }
+
     public FacetManager searchFacetsForPgc(SearchRequest request, String pgc) {
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
         QueryBuilder queryBuilder = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(request.getEntity()).get();
@@ -101,23 +125,14 @@ public class SearchService implements ApplicationListener<ApplicationReadyEvent>
         return fullTextQuery.getFacetManager();
     }
 
-    private BooleanJunction addFreeTextSearch(SearchRequest request, QueryBuilder queryBuilder, BooleanJunction bool) {
-        if (!StringUtils.isEmpty(request.getQuery())) {
-            Query query = queryBuilder
-                    .simpleQueryString()
-                    .onFields("factory", "partnumber", "gac", "pgc", "modelname", "brand", "division",
-                            "description", "countries", "status", "rg", "emissionregulation", "range", "commercialfamily", "pctfile")
-                    .boostedTo(2f).matching(request.getQuery().toLowerCase()).createQuery();
-            bool = bool.must(query);
-        }
-        return bool;
-    }
-
     private void addSorts(SearchRequest request, FullTextQuery fullTextQuery) {
         final org.springframework.data.domain.Sort sorts = request.getPageable().getSort();
         for (org.springframework.data.domain.Sort.Order order : sorts) {
             if ("pk".equals(order.getProperty())) {
                 Sort sortField = new Sort(new SortField("sort-" + order.getProperty(), SortField.Type.LONG, order.isAscending()));
+                fullTextQuery.setSort(sortField);
+            } else if (order.getProperty().contains("Count")) {
+                Sort sortField = new Sort(new SortField("sort-" + order.getProperty(), SortField.Type.INT, order.isDescending()));
                 fullTextQuery.setSort(sortField);
             } else {
                 Sort sortField = new Sort(new SortField("sort-" + order.getProperty(), SortField.Type.STRING, order.isAscending()));

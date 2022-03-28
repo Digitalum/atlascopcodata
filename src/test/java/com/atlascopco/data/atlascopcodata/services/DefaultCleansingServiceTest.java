@@ -20,23 +20,37 @@ class DefaultCleansingServiceTest {
     @BeforeEach
     void setUp() {
         synonymsStrategy = new SynonymsStrategy();
+        tokenizeKeywordsStrategy = new TokenizeKeywordsStrategy();
     }
 
     @Test
     void extractWords() {
-        List<String> values = tokenizeKeywordsStrategy.extractWords("test 123.abc", Collections.emptyList());
+        List<String> values = tokenizeKeywordsStrategy.extractWords("P.E. GENERATOR", Collections.emptyList());
+        assertEquals("P.", values.get(0));
+        assertEquals("E.", values.get(1));
+        assertEquals("GENERATOR", values.get(2));
+        values = tokenizeKeywordsStrategy.extractWords("test 123.abc", Collections.emptyList());
         assertEquals("test", values.get(0));
         assertEquals("123.", values.get(1));
         assertEquals("abc", values.get(2));
         values = tokenizeKeywordsStrategy.extractWords("o-ring test-test", Collections.emptyList());
         assertEquals("o-ring", values.get(0));
         assertEquals("test-test", values.get(1));
-        values = tokenizeKeywordsStrategy.extractWords("P.E. GENERATOR", Collections.emptyList());
-        assertEquals("P.E.", values.get(0));
-        assertEquals("GENERATOR", values.get(1));
         values = tokenizeKeywordsStrategy.extractWords("test BALL BEARING", Collections.singletonList(new Token("BALL BEARING")));
         assertEquals("test", values.get(0));
         assertEquals("BALL BEARING", values.get(1));
+        values = tokenizeKeywordsStrategy.extractWords("BEARING(+)Test", Collections.emptyList());
+        assertEquals("BEARING", values.get(0));
+        assertEquals("(+)", values.get(1));
+        assertEquals("Test", values.get(2));
+        values = tokenizeKeywordsStrategy.extractWords("FRAME BOX2.2 MB", Collections.emptyList());
+        assertEquals("FRAME", values.get(0));
+        assertEquals("BOX2.", values.get(1));
+        assertEquals("2", values.get(2));
+        assertEquals("MB", values.get(3));
+        values = tokenizeKeywordsStrategy.extractWords("BEARING(+)", Collections.singletonList(new Token("(+)")));
+        assertEquals("BEARING", values.get(0));
+        assertEquals("(+)", values.get(1));
     }
 
     @Test

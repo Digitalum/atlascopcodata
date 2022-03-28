@@ -1,7 +1,125 @@
-<html>
-<head><title>Home Page</title></head>
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Spring Boot Thymeleaf Application - Bootstrap Pagination</title>
+
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css}"/>
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+    <script>
+        $(function () {
+            $("#datepicker").datepicker({
+                dateFormat: "yy-mm-dd"
+            });
+        });
+    </script>
+</head>
 <body>
-<h1>Hello !</h1>
-<p>Welcome to <span th:text="${appName}">Our App</span></p>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+    <div class="container">
+        <a class="navbar-brand" href="/">Tokens</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+                aria-controls="navbarResponsive"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/tokens">Tokens</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Translations</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 mt-5 mb-5">
+
+            <div style="margin: 5% 30%;width: 300px;background-color: #cbefff;padding: 20px;">
+                <label for="fileupload">Choose a Excel:</label>
+                <input  type="file" id="fileupload" name="fileupload"
+                       accept="application/msexcel,application/vnd.ms-excel,application/x-msexcel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+                <button type="button" class="btn btn-primary" id="upload-button" onclick="uploadFile()"> Upload</button>
+            </div>
+            <div style="margin: 1% 30%;width: 300px;background-color: #efcbff;padding: 20px;">
+                <label for="clean-button">Start Cleaning</label>
+                <button type="button" class="btn btn-primary" id="clean-button" onclick="cleanData()"> Clean</button>
+            </div>
+            <div style="margin: 1% 30%;width: 300px;background-color: #efffcb;padding: 20px;">
+                <label for="exoport-button">Export Tokens</label>
+                <button type="button" class="btn btn-primary" id="exoport-button" onclick="exporttokens()"> Export Tokens</button>
+            </div>
+            <div style="margin: 1% 30%;width: 300px;background-color: #efffcb;padding: 20px;">
+                <label for="exoportd-button">Export Excel</label>
+                <button type="button" class="btn btn-primary" id="exoportd-button" onclick="exportexcel()"> Export Excel</button>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+
+
+<script>
+    async function uploadFile() {
+        let formData = new FormData();
+        formData.append("file", fileupload.files[0]);
+        let response = await fetch('/upload', {
+            method: "POST",
+            body: formData
+        });
+
+        if (response.status == 200) {
+            alert("File successfully uploaded.");
+        }
+    }
+
+    async function cleanData() {
+        let response = await fetch('/cleandata', {
+            method: "POST"
+        });
+
+        if (response.status == 200) {
+            alert("Clean data successfully.");
+        }
+    }
+
+    async function exporttokens() {
+        let response = await fetch('/exportTokens', {
+            method: "POST"
+        });
+
+        if (response.status == 200) {
+            alert("Clean data successfully.");
+        }
+    }
+    async function exportexcel() {
+        let response = await fetch('/download', {
+            method: "POST"
+        });
+
+        if (response.status == 200) {
+            alert("Export data successfully.");
+        }
+    }
+</script>
+
 </body>
 </html>

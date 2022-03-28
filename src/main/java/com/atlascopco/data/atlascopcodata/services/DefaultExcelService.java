@@ -5,6 +5,7 @@ package com.atlascopco.data.atlascopcodata.services;
 
 import com.atlascopco.data.atlascopcodata.dao.TranslationDocumentRepository;
 import com.atlascopco.data.atlascopcodata.model.TranslationDocument;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class DefaultExcelService {
@@ -26,7 +28,29 @@ public class DefaultExcelService {
     @Autowired
     private TranslationDocumentRepository translationDocumentRepository;
 
+    public Map<String, String> getTokenTranslations() {
+        InputStreamReader isReader = null;
+        Map<String, String> m = new HashMap<>();
+        try {
+            isReader = new InputStreamReader(new FileInputStream("config/TRANSLATIONS_NL.csv"));
+            //Creating a BufferedReader object
+            BufferedReader reader = new BufferedReader(isReader);
+            String str;
+            while ((str = reader.readLine()) != null) {
+                if (str.split("=").length == 2) {
+                    m.put(str.split("=")[0], str.split("=")[1]);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return m;
+    }
+
     public void writeExcel(List<TranslationDocument> list) throws Exception {
+        final Map<String, String> tokenTranslations = getTokenTranslations();
         System.out.println("-------------RUN-------------------------------\n");
         Workbook workbook = new XSSFWorkbook();
 
@@ -37,7 +61,7 @@ public class DefaultExcelService {
         Row header = sheet.createRow(0);
 
         CellStyle headerStyle = workbook.createCellStyle();
-        headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+        //headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
         headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         XSSFFont font = ((XSSFWorkbook) workbook).createFont();
@@ -62,6 +86,10 @@ public class DefaultExcelService {
         headerCell.setCellValue("Category");
         headerCell.setCellStyle(headerStyle);
 
+        headerCell = header.createCell(4);
+        headerCell.setCellValue("NL");
+        headerCell.setCellStyle(headerStyle);
+
         int i = 1;
         for (TranslationDocument translationDocument : list) {
 
@@ -82,6 +110,11 @@ public class DefaultExcelService {
             headerCell.setCellValue(translationDocument.getCategory());
             headerCell.setCellStyle(headerStyle);
 
+            headerCell = dataRow.createCell(4);
+            final String translated = translationDocument.getTokens().stream().map(x -> translate(x.getId(), tokenTranslations)).collect(Collectors.joining(" "));
+            headerCell.setCellValue(translated);
+            headerCell.setCellStyle(headerStyle);
+
             i++;
         }
 
@@ -94,6 +127,13 @@ public class DefaultExcelService {
         FileOutputStream outputStream = new FileOutputStream(fileLocation);
         workbook.write(outputStream);
         workbook.close();
+    }
+
+    private String translate(String value, Map<String, String> m) {
+        if (m.containsKey(value)) {
+            return m.get(value);
+        }
+        return value;
     }
 
     @Transactional
@@ -114,16 +154,18 @@ public class DefaultExcelService {
             String original_name = format(row.getCell(2));
             String category = format(row.getCell(3));
             String brand = format(row.getCell(4));
-System.out.println(i);
-i++;
-            TranslationDocument translationDocument = new TranslationDocument(code, original_name, category, brand);
-            translationDocumentRepository.save(translationDocument);
+            i++;
+            if (StringUtils.isNotEmpty(code)) {
+                TranslationDocument translationDocument = new TranslationDocument(code, original_name, category, brand);
+                translationDocumentRepository.save(translationDocument);
+                System.out.println(i);
+            }
         }
         System.out.println(translationDocumentRepository.findAll().size());
     }
 
     public void loadExcel() throws IOException {
-        loadExcel(new FileInputStream(new File("/home/jeroen/projects/ac_data_cleaning/atlascopcodata/sample_data.xlsx")));
+        loadExcel(new FileInputStream(new File("/home/jeroen/projects/ac_data_cleaning/atlascopcodata/export_.xlsx")));
     }
 
     private static DecimalFormat df = new DecimalFormat("###");

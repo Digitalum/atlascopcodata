@@ -4,17 +4,20 @@
 package com.atlascopco.data.atlascopcodata.rules;
 
 import com.atlascopco.data.atlascopcodata.dao.TokenRepository;
-import com.atlascopco.data.atlascopcodata.dto.SynonymDto;
 import com.atlascopco.data.atlascopcodata.model.Token;
+import com.atlascopco.data.atlascopcodata.search.DefaultTokenService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -22,6 +25,8 @@ public class DefaultRulesService {
 
     @Autowired
     private TokenRepository tokenRepository;
+    @Autowired
+    private DefaultTokenService tokenService;
 
     public List<RuleGroupDto> getRules() throws IOException {
         InputStreamReader isReader = new InputStreamReader(new FileInputStream("config/rules.json"));
@@ -41,35 +46,32 @@ public class DefaultRulesService {
     }
 
     public void saveSynonyms(String fileName, List<Token> synonymDtoList) throws IOException {
-        //String fileName = "keywords.csv";
         String str = synonymDtoList.stream()
-           //     .filter(x -> !x.isGenerated())
+                //     .filter(x -> !x.isGenerated())
                 .map(x -> x.getId() + "=" + x.getSynonyms().stream().collect(Collectors.joining(","))).collect(Collectors.joining("\n"));
         BufferedWriter writer = new BufferedWriter(new FileWriter("config/" + fileName));
         writer.write(str);
         writer.close();
     }
 
-    public List<Token> getKeywords() {
-        return tokenRepository.findAllByType("WORD");
-    }
-
-    public List<Token> getSentences() {
-        return tokenRepository.findAllByType("SENTENCE");
-    }
-
-    public List<Token> getFixedNames() {
-        return tokenRepository.findAllByType("FIXED_NAME");
-    }
-
     public void importTokens() {
-        tokenRepository.saveAll(getTokensFromCsv("keywords.csv"));
-        tokenRepository.saveAll(getTokensFromCsv("fixed_names.csv"));
-        tokenRepository.saveAll(getTokensFromCsv("sentences.csv"));
-        // TODO add reverse synonyms
+        tokenRepository.saveAll(getTokensFromCsv("WORD.csv", "WORD"));
+        tokenRepository.saveAll(getTokensFromCsv("FIXED_NAME.csv", "FIXED_NAME"));
+        tokenRepository.saveAll(getTokensFromCsv("SENTENCE.csv", "SENTENCE"));
     }
 
-    public List<Token> getTokensFromCsv(String fileName) {
+    public void exportTokens() {
+        try {
+            for (Token.TokenType value : Token.TokenType.values()) {
+                saveSynonyms(value + ".csv", tokenService.getTokens(value));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public List<Token> getTokensFromCsv(String fileName, String type) {
         InputStreamReader isReader = null;
         List<Token> synonymDtos = new ArrayList<>();
         try {
@@ -81,6 +83,7 @@ public class DefaultRulesService {
             String str;
             while ((str = reader.readLine()) != null) {
                 Token token = new Token(str.split("=")[0]);
+                token.setType(Token.TokenType.valueOf(type));
                 Map<String, List<String>> m = new HashMap<>();
                 if (str.split("=").length == 2) {
                     for (String s : str.split("=")[1].split(",")) {
@@ -89,8 +92,10 @@ public class DefaultRulesService {
                 } else {
 
                 }
-                // TODO sort synonums by length synonymDto.getSynonyms().sor
-                synonymDtos.add(token);
+                if (StringUtils.isNotEmpty(token.getId())) {
+                    // TODO sort synonums by length synonymDto.getSynonyms().sor
+                    synonymDtos.add(token);
+                } 
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -99,23 +104,5 @@ public class DefaultRulesService {
         }
         return synonymDtos;
     }
-
-    public void saveFixedNames(List<Token> synonymDtoList) throws IOException {
-        saveSynonyms("fixed_names.csv", synonymDtoList);
-    }
-
-
-    public void saveSentences(List<Token> synonymDtoList) throws IOException {
-        saveSentences("sentences.csv", synonymDtoList);
-    }
-
-    private void saveSentences(String fileName, List<Token> synonymDtoList) throws IOException {
-        String str = synonymDtoList.stream().map(Token::getId).collect(Collectors.joining("\n"));
-        BufferedWriter writer = new BufferedWriter(new FileWriter("config/" + fileName));
-        writer.write(str);
-        writer.close();
-
-    }
-
 
 }

@@ -3,8 +3,6 @@
  */
 package com.atlascopco.data.atlascopcodata.strategies;
 
-import com.atlascopco.data.atlascopcodata.dto.KeywordDto;
-import com.atlascopco.data.atlascopcodata.dto.SynonymDto;
 import com.atlascopco.data.atlascopcodata.model.Token;
 import com.atlascopco.data.atlascopcodata.model.TranslationDocument;
 import com.atlascopco.data.atlascopcodata.rules.DataRuleDto;
@@ -37,12 +35,13 @@ public class SynonymsStrategy extends CleaningStrategy {
         List<Token> allSys = new ArrayList<>();
         Map<String, Token> m = new HashMap<>();
         for (FileSynonymDto file : ruleRule.getFiles()) {
-            final List<Token> synonyms = tokenService.getTokens(file.getType());
+            final List<Token> synonyms = tokenService.getTokens(Token.TokenType.valueOf(file.getType()));
+            System.out.println(file.getType() + " : " + synonyms.size());
             allSys.addAll(synonyms);
 
             for (Token name : synonyms) {
                 final Token orCreateToken = tokenService.getOrCreateToken(name.getId());
-                orCreateToken.setId(file.getType());
+                orCreateToken.setType(Token.TokenType.valueOf(file.getType()));
                 m.put(name.getId(), orCreateToken);
                 if (file.isRevert()) {
                     generateReverseSynonym(name);
@@ -58,15 +57,18 @@ public class SynonymsStrategy extends CleaningStrategy {
     @Override
     public void clean(TranslationDocument doc, DataRuleDto ruleRule, Map<String, Object> ctx) {
         if (isRuleTriggered(doc, ruleRule.getTrigger(), ctx)) {
-            final List<SynonymDto> synonymDtos = (List<SynonymDto>) ctx.get("sentences");
+            final List<Token> synonymDtos = (List<Token>) ctx.get("sentences");
 
-
-            for (SynonymDto synonym : synonymDtos) {
+            String oldValuelower = doc.getValue().toLowerCase();
+            for (Token synonym : synonymDtos) {
                 for (String s : synonym.getSynonyms()) {
-                    String s2 = "(?i)" + s.replace(".", "\\.");
-                    String newValue = synonym.getKey();
-                    String oldValue = doc.getValue();
-                    doc.setNew_name(replaceSynonym(oldValue, s2, newValue));
+                    if (oldValuelower.contains(s.toLowerCase())) {
+                        String oldValue = doc.getValue();
+
+                        String s2 = "(?i)" + s.replace(".", "\\.");
+                        String newValue = synonym.getId();
+                        doc.setNew_name(replaceSynonym(oldValue, s2, newValue));
+                    }
                 }
             }
         }
@@ -87,7 +89,7 @@ public class SynonymsStrategy extends CleaningStrategy {
         Matcher m = p.matcher(oldValue);
         if (m.find()) {
             // replace first number with "number" and second number with the first
-           return m.replaceFirst("$1" + newValue + "$2").trim();  // number 46
+            return m.replaceFirst("$1" + newValue + "$2").trim();  // number 46
         }
 
         return oldValue.trim();

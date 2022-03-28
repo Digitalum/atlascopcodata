@@ -9,13 +9,11 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 
 import java.util.Collection;
 
-public class DocumentFieldBridge implements TwoWayFieldBridge {
+public class CollectionCountBridge implements TwoWayFieldBridge {
 
     @Override
     public void set(String name, Object tokens, Document document, LuceneOptions luceneOptions) {
-        for (TranslationDocument token : (Collection<TranslationDocument>) tokens) {
-            luceneOptions.addFieldToDocument(name, token.getCode(), document);
-        }
+        luceneOptions.addFieldToDocument(name, objectToString(tokens), document);
     }
 
     @Override
@@ -24,7 +22,11 @@ public class DocumentFieldBridge implements TwoWayFieldBridge {
     }
 
     @Override
-    public String objectToString(Object o) {
-        return String.valueOf(o);
+    public String objectToString(Object object) {
+        if (object == null || (!(object instanceof Collection))) {
+            return null;
+        }
+        Collection<?> coll = (Collection<?>) object;
+        return String.valueOf(coll.size());
     }
 }

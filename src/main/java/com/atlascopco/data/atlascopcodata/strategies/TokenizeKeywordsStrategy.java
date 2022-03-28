@@ -19,8 +19,6 @@ import java.util.stream.Collectors;
 public class TokenizeKeywordsStrategy extends CleaningStrategy {
 
     @Autowired
-    private DefaultRulesService rulesService;
-    @Autowired
     private DefaultTokenService tokenService;
 
     @Override
@@ -34,12 +32,13 @@ public class TokenizeKeywordsStrategy extends CleaningStrategy {
         List<Token> allSys = new ArrayList<>();
         Map<String, Token> m = new HashMap<>();
         for (FileSynonymDto file : ruleRule.getFiles()) {
-            final List<Token> synonyms = tokenService.getTokens(file.getType());
+            final List<Token> synonyms = tokenService.getTokens(Token.TokenType.valueOf(file.getType()));
+            System.out.println(file.getType() + " : " + synonyms.size());
             allSys.addAll(synonyms);
 
             for (Token name : synonyms) {
                 final Token orCreateToken = tokenService.getOrCreateToken(name.getId());
-                orCreateToken.setType(file.getType());
+                orCreateToken.setType(Token.TokenType.valueOf(file.getType()));
                 m.put(name.getId(), orCreateToken);
                 if (file.isRevert()) {
                     generateReverseSynonym(name);
@@ -68,7 +67,7 @@ public class TokenizeKeywordsStrategy extends CleaningStrategy {
                     }
 
                     final Token orCreateToken = tokenService.getOrCreateToken(s);
-                    orCreateToken.setType(type);
+                    orCreateToken.setType(Token.TokenType.valueOf(type));
                     m.put(s, orCreateToken);
                 }
                 m.get(s).getDocuments().add(doc);
@@ -78,15 +77,21 @@ public class TokenizeKeywordsStrategy extends CleaningStrategy {
     }
 
     public List<String> extractWords(String value, List<Token> sentences) {
-        value = value.replace(". ", ".");
-        List<String> split = List.of(value.split("(?<=[ \\.])"));
+        //value = value.replace(". ", ".");
+        List<String> split1 = List.of(value.split("(?<=[ \\.\\)])"));
+        List<String> split = new ArrayList<>();
+        for (String s : split1) {
+            split.addAll(List.of(s.split("(?=[\\(])")));
+        }
+        split = split.stream().filter(x -> !x.isBlank()).collect(Collectors.toList());
+
         List<String> result = new ArrayList<>();
         String rejoinString = "";
 
         split = rejoinFixedSentencesKeyword(sentences, split);
 
         for (String s : split) {
-            if (countCharacters(s) > 1) {
+            if (countCharacters(s) > 0) {
                 if (!rejoinString.isEmpty()) {
                     result.add(rejoinString.trim());
                     rejoinString = "";
@@ -111,6 +116,9 @@ public class TokenizeKeywordsStrategy extends CleaningStrategy {
         if (!usedSentences.isEmpty()) {
             String joined2 = String.join("$SEP$", split);
             for (String usedSentence : usedSentences) {
+                usedSentence = usedSentence.replace("+","\\+");
+                usedSentence = usedSentence.replace("(","\\(");
+                usedSentence = usedSentence.replace(")","\\)");
                 joined2 = joined2.replaceAll("(?i)" + usedSentence.replace(" ", "[\\s]?\\$SEP\\$"), usedSentence);
             }
             split = List.of(joined2.split("\\$SEP\\$"));

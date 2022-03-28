@@ -30,7 +30,7 @@
         "regex": "value.trim()"
       },
       {
-        "code": "Word replacements",
+        "code": "Word replacements (slow)",
         "trigger": "true",
         "strategy": "SYNONYMS",
         "files": [
@@ -39,7 +39,7 @@
           }]
       },
       {
-        "code": "Sentences Replacements",
+        "code": "Sentences Replacements (very slow)",
         "trigger": "true",
         "strategy": "SYNONYMS",
         "files": [

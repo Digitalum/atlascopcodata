@@ -5,6 +5,7 @@ package com.atlascopco.data.atlascopcodata.model;
 
 import lombok.Data;
 import org.hibernate.search.annotations.*;
+import org.hibernate.search.annotations.Index;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -30,8 +31,10 @@ public class TranslationDocument {
 
     @Fields({
             @Field(name = "code", analyze = Analyze.YES),
-            @Field(name = FACET_PREFIX + "code",  analyze = Analyze.NO)
+            @Field(name = FACET_PREFIX + "code",  analyze = Analyze.NO),
+            @Field(name = SORT_PREFIX + "code", index = Index.NO, analyze = Analyze.NO)
     })
+    @SortableField(forField = SORT_PREFIX + "code")
     @Column
     private String code;
 
@@ -44,8 +47,10 @@ public class TranslationDocument {
 
     @Fields({
             @Field(name = "newName", analyze = Analyze.YES),
-            @Field(name = FACET_PREFIX + "code",  analyze = Analyze.NO)
+            @Field(name = FACET_PREFIX + "newName",  analyze = Analyze.NO),
+            @Field(name = SORT_PREFIX + "newName", index = Index.NO, analyze = Analyze.NO)
     })
+    @SortableField(forField = SORT_PREFIX + "newName")
     @Column
     private String new_name;
 

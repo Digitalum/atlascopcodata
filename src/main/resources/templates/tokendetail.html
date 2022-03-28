@@ -1,0 +1,128 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Spring Boot Thymeleaf Application - Bootstrap Pagination</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="/content/main.css"/>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+    <div class="container">
+        <a class="navbar-brand" href="/">Tokens</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+                aria-controls="navbarResponsive"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/tokens">Tokens</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Translations</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<h1>
+    Token
+    <span th:text="${token.id}"></span>(<span th:text="${token.type}"></span>)
+</h1>
+<h2>
+    Synonyms
+</h2>
+<td class="synonyms">
+    <div class="synonynm" th:each="s : ${token.synonyms}" th:text="${s}"></div>
+</td>
+
+
+<h2>
+    Products
+</h2>
+
+<div class="container" style="width: 100%;max-width: 100%">
+    <div class="row">
+        <div class="col-lg-10 mt-5 mb-5">
+
+            <table id="documentstable" class="table table-bordered table-responsive-sm table-sm" style="font-size: 9pt">
+                <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Original Text</th>
+                    <th>New Text</th>
+                    <th>Tokens</th>
+                    <th>Category</th>
+                    <th>Brand</th>
+                    <th>Changes</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <span id="popuptoken" class="token">MAINTENANCE</span><br/>
+                Token Type<select id="popuptype" class="type">
+                <option>WORD</option>
+                <option>WORD_NOT_TRANSLATABLE</option>
+                <option>SENTENCE</option>
+                <option>FIXED_NAME</option>
+                <option>UNDEFINED</option>
+                <option>UNDEFINED_ABBR</option>
+                <option>SYNONYM</option>
+            </select><br/>
+                Synonym for word : <input id="synonymtoken" type="text"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveToken()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+
+
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+
+
+<!--script src="/content/main.js"></script-->
+<script src="/content/documents.js"></script>
+
+</body>
+</html>

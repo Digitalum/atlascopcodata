@@ -13,7 +13,7 @@ public class KeywordDto implements Comparable {
     private String key;
     private String type; // UNDEFINED, DEFINED, FIXED
     private List<String> synonyms = new ArrayList<>();
-    private List<String> partNumbers = new ArrayList<>();
+    private int documentCount = -1;
     private SynonymDto synonymDto;
 
     public KeywordDto(String key, String type) {
@@ -22,7 +22,7 @@ public class KeywordDto implements Comparable {
     }
 
     public int getCount() {
-        return partNumbers.size();
+        return documentCount;
     }
 
     @Override
