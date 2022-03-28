@@ -9,11 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface TranslationDocumentRepository extends JpaRepository<TranslationDocument, Integer> {
+public interface TranslationDocumentRepository extends JpaRepository<TranslationDocument, String> {
 
     @Query(value = "SELECT c FROM TranslationDocument AS c")
     List<TranslationDocument> findAllWhereNewStatusIsNull();
 
+    Optional<TranslationDocument> findByCode(String s);
 }

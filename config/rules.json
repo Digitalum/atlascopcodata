@@ -46,16 +46,6 @@
           }]
       },
       {
-        "code": "Sentences Replacements (very slow)",
-        "trigger": "true",
-        "strategy": "SYNONYMS",
-        "files": [
-          {
-            "type": "SENTENCE",
-            "revert": true
-          }]
-      },
-      {
         "code": "Tokenize fixed_names",
         "trigger": "true",
         "strategy": "TOKENIZE",
@@ -65,12 +55,14 @@
           },
           {
             "type": "FIXED_NAME"
-          },
-          {
-            "type": "SENTENCE",
-            "revert": true
           }
         ]
+      },
+      {
+        "code": "Synonum Token",
+        "trigger": "true",
+        "strategy": "SYNONYM_TOKEN",
+        "files": []
       },
       {
         "code": "Proper Casing",

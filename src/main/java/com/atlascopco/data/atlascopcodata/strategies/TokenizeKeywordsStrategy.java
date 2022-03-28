@@ -6,7 +6,6 @@ package com.atlascopco.data.atlascopcodata.strategies;
 import com.atlascopco.data.atlascopcodata.model.Token;
 import com.atlascopco.data.atlascopcodata.model.TranslationDocument;
 import com.atlascopco.data.atlascopcodata.rules.DataRuleDto;
-import com.atlascopco.data.atlascopcodata.rules.DefaultRulesService;
 import com.atlascopco.data.atlascopcodata.rules.FileSynonymDto;
 import com.atlascopco.data.atlascopcodata.search.DefaultTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,24 +28,25 @@ public class TokenizeKeywordsStrategy extends CleaningStrategy {
     @Override
     public Map<String, Object> createContext(DataRuleDto ruleRule) {
         final Map<String, Object> context = super.createContext(ruleRule);
-        List<Token> allSys = new ArrayList<>();
+        //List<Token> allSys = new ArrayList<>();
         Map<String, Token> m = new HashMap<>();
         for (FileSynonymDto file : ruleRule.getFiles()) {
             final List<Token> synonyms = tokenService.getTokens(Token.TokenType.valueOf(file.getType()));
             System.out.println(file.getType() + " : " + synonyms.size());
-            allSys.addAll(synonyms);
+            //allSys.addAll(synonyms);
 
             for (Token name : synonyms) {
-                final Token orCreateToken = tokenService.getOrCreateToken(name.getId());
+                final Token orCreateToken = tokenService.getOrCreateToken(name);
                 orCreateToken.setType(Token.TokenType.valueOf(file.getType()));
-                m.put(name.getId(), orCreateToken);
+                m.put(name.getCode(), orCreateToken);
                 if (file.isRevert()) {
-                    generateReverseSynonym(name);
+                    //generateReverseSynonym(name);
                 }
             }
         }
 
-        context.put("sentences", allSys);
+        System.out.println("createContext DONE");
+        //context.put("sentences", allSys);
         context.put("sentencesM", m);
         return context;
     }
@@ -55,19 +55,14 @@ public class TokenizeKeywordsStrategy extends CleaningStrategy {
     public void clean(TranslationDocument doc, DataRuleDto dataRuleDto, Map<String, Object> ctx) {
         if (isRuleTriggered(doc, dataRuleDto.getTrigger(), ctx)) {
 
-            final List<Token> sentences = (List<Token>) ctx.get("sentences");
+            //final List<Token> sentences = (List<Token>) ctx.get("sentences");
             final Map<String, Token> m = (Map<String, Token>) ctx.get("sentencesM");
 
             String value = doc.getValue().toUpperCase().trim();
-            for (String s : extractWords(value, sentences)) {
+            for (String s : extractWords(value, null)) {
                 if (!m.containsKey(s)) {
-                    String type = "UNDEFINED";
-                    if (s.matches(".*[aA-zZ].*") && s.matches(".*[0-9].*")) {
-                        type = "UNDEFINED_ABBR";
-                    }
-
                     final Token orCreateToken = tokenService.getOrCreateToken(s);
-                    orCreateToken.setType(Token.TokenType.valueOf(type));
+                    orCreateToken.setType(getDefaultTokenType(s));
                     m.put(s, orCreateToken);
                 }
                 m.get(s).getDocuments().add(doc);
@@ -76,9 +71,17 @@ public class TokenizeKeywordsStrategy extends CleaningStrategy {
         }
     }
 
+    private Token.TokenType getDefaultTokenType(String s) {
+        String type = "UNDEFINED";
+        if (s.matches(".*[aA-zZ].*") && s.matches(".*[0-9].*")) {
+            type = "UNDEFINED_ABBR";
+        }
+        return Token.TokenType.valueOf(type);
+    }
+
     public List<String> extractWords(String value, List<Token> sentences) {
         //value = value.replace(". ", ".");
-        List<String> split1 = List.of(value.split("(?<=[ \\.\\)])"));
+        List<String> split1 = List.of(value.split("(?<=[ \\.\\,:)])"));
         List<String> split = new ArrayList<>();
         for (String s : split1) {
             split.addAll(List.of(s.split("(?=[\\(])")));
@@ -88,7 +91,7 @@ public class TokenizeKeywordsStrategy extends CleaningStrategy {
         List<String> result = new ArrayList<>();
         String rejoinString = "";
 
-        split = rejoinFixedSentencesKeyword(sentences, split);
+        //split = rejoinFixedSentencesKeyword(sentences, split);
 
         for (String s : split) {
             if (countCharacters(s) > 0) {
@@ -108,10 +111,9 @@ public class TokenizeKeywordsStrategy extends CleaningStrategy {
         return result;
     }
 
-
     private List<String> rejoinFixedSentencesKeyword(List<Token> sentences, List<String> split) {
         final String joined = String.join("", split);
-        final List<String> usedSentences = sentences.stream().map(Token::getId)
+        final List<String> usedSentences = sentences.stream().map(Token::getCode)
                 .filter(sentence -> joined.toUpperCase().contains(sentence.toUpperCase())).collect(Collectors.toList());
         if (!usedSentences.isEmpty()) {
             String joined2 = String.join("$SEP$", split);
@@ -131,7 +133,7 @@ public class TokenizeKeywordsStrategy extends CleaningStrategy {
     }
 
     private void generateReverseSynonym(Token sentence) {
-        final List<String> strings = new ArrayList<>(Arrays.asList(sentence.getId().split(" ")));
+        final List<String> strings = new ArrayList<>(Arrays.asList(sentence.getCode().split(" ")));
         Collections.reverse(strings);
         String reversed = String.join(" ", strings);
         //sentence.setGenerated(true);

@@ -111,7 +111,7 @@ public class DefaultExcelService {
             headerCell.setCellStyle(headerStyle);
 
             headerCell = dataRow.createCell(4);
-            final String translated = translationDocument.getTokens().stream().map(x -> translate(x.getId(), tokenTranslations)).collect(Collectors.joining(" "));
+            final String translated = translationDocument.getTokens().stream().map(x -> translate(x.getCode(), tokenTranslations)).collect(Collectors.joining(" "));
             headerCell.setCellValue(translated);
             headerCell.setCellStyle(headerStyle);
 

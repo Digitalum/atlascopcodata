@@ -23,11 +23,10 @@ public class TranslationDocument {
 
     @Id
     @Column
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="doc_sequence")
+    @SequenceGenerator(name="doc_sequence", sequenceName = "doc_sequence", allocationSize = 100)
     public long id;
 
-    // @Id
-    // private String id;
 
     @Fields({
             @Field(name = "code", analyze = Analyze.YES),
@@ -40,10 +39,11 @@ public class TranslationDocument {
 
 
     @Fields({
-            @Field(name = "originalName", analyze = Analyze.YES),
-            @Field(name = SORT_PREFIX + "originalName", index = Index.NO, analyze = Analyze.NO)
+            @Field(name = "original_name", analyze = Analyze.YES),
+            @Field(name = FACET_PREFIX + "original_name",  analyze = Analyze.NO),
+            @Field(name = SORT_PREFIX + "original_name", index = Index.NO, analyze = Analyze.NO)
     })
-    @SortableField(forField = SORT_PREFIX + "originalName")
+    @SortableField(forField = SORT_PREFIX + "original_name")
     @Column
     private String original_name;
 

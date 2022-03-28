@@ -29,8 +29,8 @@ $(document).ready(function () {
         "columns": [
             {
                 "data": "id",
-                render: function (data, type,  row, meta) {
-                    return '<div class="keyword ' + row.type + '"><a href="/tokens/detail/' + data + '" >' + data + ' </a></div>';
+                render: function (id, type, row, meta) {
+                    return '<div class="keyword ' + row.type + '"><a href="/tokens/detail/' + id + '" >' + id + ' </a></div>';
                 }
 
             },
@@ -46,9 +46,36 @@ $(document).ready(function () {
 
                     return a;
                 }
+            },
+            {
+                data: "synonymTokenParents",
+                render: function (data, type) {
+                    var a = "";
+                    $(data).each(function (index, s) {
+                        a += ' <div class="synonynmgroup">'
+                        $(s.tokens).each(function (index, s) {
+                            a += ' <div class="synonynm">'
+                            a += s + " ";
+                            a += '</div>';
+                        });
+                        a += '</div>'
+                    });
+                    return a;
+                }
+            },
+            {
+                data: "synonymsTokenGroups",
+                render: function (data, type) {
+                    var a = "";
+                    $(data).each(function (index, s) {
+                        a += ' <div class="synonynm">'
+                        a +=  s.parent;
+                        a += '</div>';
+                    });
+
+                    return a;
+                }
             }
         ],
     })
-
-
 });

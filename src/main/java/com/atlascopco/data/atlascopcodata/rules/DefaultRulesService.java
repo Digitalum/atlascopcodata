@@ -57,7 +57,7 @@ public class DefaultRulesService {
     public void importTokens() {
         tokenRepository.saveAll(getTokensFromCsv("WORD.csv", "WORD"));
         tokenRepository.saveAll(getTokensFromCsv("FIXED_NAME.csv", "FIXED_NAME"));
-        tokenRepository.saveAll(getTokensFromCsv("SENTENCE.csv", "SENTENCE"));
+        //tokenRepository.saveAll(getTokensFromCsv("SENTENCE.csv", "SENTENCE"));
     }
 
     public void exportTokens() {
@@ -92,10 +92,10 @@ public class DefaultRulesService {
                 } else {
 
                 }
-                if (StringUtils.isNotEmpty(token.getId())) {
+                if (StringUtils.isNotEmpty(token.getCode())) {
                     // TODO sort synonums by length synonymDto.getSynonyms().sor
                     synonymDtos.add(token);
-                } 
+                }
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();

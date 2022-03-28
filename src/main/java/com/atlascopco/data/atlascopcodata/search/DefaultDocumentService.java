@@ -6,9 +6,7 @@ package com.atlascopco.data.atlascopcodata.search;
 import com.atlascopco.data.atlascopcodata.controller.paging.Paged;
 import com.atlascopco.data.atlascopcodata.controller.paging.Paging;
 import com.atlascopco.data.atlascopcodata.dao.TranslationDocumentRepository;
-import com.atlascopco.data.atlascopcodata.dto.TokenDto;
 import com.atlascopco.data.atlascopcodata.dto.TranslationDocumentDto;
-import com.atlascopco.data.atlascopcodata.model.Token;
 import com.atlascopco.data.atlascopcodata.model.TranslationDocument;
 import com.atlascopco.data.atlascopcodata.search.search.SearchRequest;
 import com.atlascopco.data.atlascopcodata.search.search.SearchResponse;
@@ -28,17 +26,21 @@ public class DefaultDocumentService {
     @Autowired
     private TranslationDocumentRepository translationDocumentRepository;
 
-    public List<TranslationDocument> getDocumentsForKeyword(String token) {
+    public TranslationDocument getDocumentForCode(String token) {
+        return translationDocumentRepository.findByCode(token).get();
+    }
+
+    public List<TranslationDocument> getDocumentsForKeyword(String tokenId) {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.setEntity(TranslationDocument.class);
         searchRequest.setPageable(PageRequest.of(0, 5000));
-        searchRequest.addFilter("tokens", token);
+        searchRequest.addFilter("tokens", tokenId);
         final SearchResponse<TranslationDocument> search = searchService.search(searchRequest);
         return search.getResult();
     }
 
 
-    public Paged<TranslationDocumentDto> getPagedDocuments(SearchRequest searchRequest ) {
+    public Paged<TranslationDocumentDto> getPagedDocuments(SearchRequest searchRequest) {
         final SearchResponse<TranslationDocument> search = searchService.search(searchRequest);
         final List<TranslationDocumentDto> tokendDtos = search.getResult().stream().map(TranslationDocumentDto::new).collect(Collectors.toList());
         final PageImpl<TranslationDocumentDto> page = new PageImpl<>(tokendDtos, searchRequest.getPageable(), search.getResultSize());
@@ -47,7 +49,7 @@ public class DefaultDocumentService {
     }
 
 
-    public List<TranslationDocument> getAllDocuments()   {
+    public List<TranslationDocument> getAllDocuments() {
         return translationDocumentRepository.findAll();
     }
 

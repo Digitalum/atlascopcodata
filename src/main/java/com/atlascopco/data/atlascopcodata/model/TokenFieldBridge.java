@@ -14,7 +14,7 @@ public class TokenFieldBridge implements TwoWayFieldBridge {
     @Override
     public void set(String name, Object tokens, Document document, LuceneOptions luceneOptions) {
         for (Token token : (Collection<Token>) tokens) {
-            luceneOptions.addFieldToDocument(name, token.getId().toLowerCase(), document);
+            luceneOptions.addFieldToDocument(name, String.valueOf(token.getId()), document);
         }
     }
 

@@ -35,12 +35,17 @@ public class DefaultCleansingService {
     @PersistenceContext
     private EntityManager entityManager;
 
+
+    @Transactional
+    public void executeCleaningRules2(List<TranslationDocument> docs) throws Exception {
+        executeCleaningRules(docs);
+    }
+
     @Transactional
     public void executeCleaningRules() throws Exception {
         executeCleaningRules(translationDocumentRepository.findAll());
     }
 
-    @Transactional
     public void executeCleaningRules(List<TranslationDocument> docs) throws Exception {
 
         System.out.println("Execute Cleaning Rules");

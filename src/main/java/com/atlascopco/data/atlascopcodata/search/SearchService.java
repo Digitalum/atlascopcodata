@@ -128,7 +128,7 @@ public class SearchService implements ApplicationListener<ApplicationReadyEvent>
     private void addSorts(SearchRequest request, FullTextQuery fullTextQuery) {
         final org.springframework.data.domain.Sort sorts = request.getPageable().getSort();
         for (org.springframework.data.domain.Sort.Order order : sorts) {
-            if ("pk".equals(order.getProperty())) {
+            if ("pk".equals(order.getProperty()) || "id".equals(order.getProperty())) {
                 Sort sortField = new Sort(new SortField("sort-" + order.getProperty(), SortField.Type.LONG, order.isAscending()));
                 fullTextQuery.setSort(sortField);
             } else if (order.getProperty().contains("Count")) {

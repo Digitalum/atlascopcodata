@@ -6,7 +6,6 @@ package com.atlascopco.data.atlascopcodata.strategies;
 import com.atlascopco.data.atlascopcodata.model.Token;
 import com.atlascopco.data.atlascopcodata.model.TranslationDocument;
 import com.atlascopco.data.atlascopcodata.rules.DataRuleDto;
-import com.atlascopco.data.atlascopcodata.rules.DefaultRulesService;
 import com.atlascopco.data.atlascopcodata.rules.FileSynonymDto;
 import com.atlascopco.data.atlascopcodata.search.DefaultTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +19,11 @@ import java.util.regex.Pattern;
 public class SynonymsStrategy extends CleaningStrategy {
 
     @Autowired
-    private DefaultRulesService rulesService;
-    @Autowired
     private DefaultTokenService tokenService;
 
     @Override
     public boolean isApplicable(DataRuleDto type) {
-        return "SYNONYMS".equals(type.getStrategy()) || "SYNONYMS_REVERSED".equals(type.getStrategy());
+        return "SYNONYMS".equals(type.getStrategy());
     }
 
     @Override
@@ -40,11 +37,11 @@ public class SynonymsStrategy extends CleaningStrategy {
             allSys.addAll(synonyms);
 
             for (Token name : synonyms) {
-                final Token orCreateToken = tokenService.getOrCreateToken(name.getId());
+                final Token orCreateToken = tokenService.getOrCreateToken(name);
                 orCreateToken.setType(Token.TokenType.valueOf(file.getType()));
-                m.put(name.getId(), orCreateToken);
+                m.put(name.getCode(), orCreateToken);
                 if (file.isRevert()) {
-                    generateReverseSynonym(name);
+                    //generateReverseSynonym(name);
                 }
             }
         }
@@ -66,7 +63,7 @@ public class SynonymsStrategy extends CleaningStrategy {
                         String oldValue = doc.getValue();
 
                         String s2 = "(?i)" + s.replace(".", "\\.");
-                        String newValue = synonym.getId();
+                        String newValue = synonym.getCode();
                         doc.setNew_name(replaceSynonym(oldValue, s2, newValue));
                     }
                 }
@@ -74,8 +71,9 @@ public class SynonymsStrategy extends CleaningStrategy {
         }
     }
 
+    @Deprecated
     private void generateReverseSynonym(Token sentence) {
-        final List<String> strings = new ArrayList<>(Arrays.asList(sentence.getId().split(" ")));
+        final List<String> strings = new ArrayList<>(Arrays.asList(sentence.getCode().split(" ")));
         Collections.reverse(strings);
         String reversed = String.join(" ", strings);
         //sentence.setGenerated(true);

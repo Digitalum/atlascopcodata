@@ -7,6 +7,7 @@
 
     <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css}"/>
     <link rel="stylesheet" href="/content/main.css"/>
+
 </head>
 <body>
 
@@ -44,10 +45,33 @@
 <h2>
     Synonyms
 </h2>
+
+<h4>
+    Word Replacements
+</h4>
 <td class="synonyms">
     <div class="synonynm" th:each="s : ${token.synonyms}" th:text="${s}"></div>
 </td>
+<h4>
+    Token Parents
+</h4>
+<td class="synonyms">
+    <a th:each="s : ${token.synonymGroups}" th:href="${'/tokens/detail/' + s.parent}">
+        <div class="synonynm" th:text="${s.parent}"></div>
+        <span>(-)</span>
+    </a>
+</td>
+<h4>
+    Used in Synonym Tokens
+</h4>
+<div class="synonynmgroup" th:each="s : ${token.synonymParents}">
+    <a th:each="s : ${s.tokens}" th:href="${'/tokens/detail/' + s}">
+        <div class="synonynm" th:text="${s}"></div>
+    </a>
+    <span>(-)</span>
+</div>
 
+<button type="button" style="float:right" onclick="deleteCurrentToken()" class="btn btn-danger">Delete</button>
 
 <h2>
     Products
@@ -84,27 +108,73 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <h5 class="modal-title" id="exampleModalLongTitle">Edit Token</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <span id="popuptoken" class="token">MAINTENANCE</span><br/>
-                Token Type<select id="popuptype" class="type">
-                <option>WORD</option>
-                <option>WORD_NOT_TRANSLATABLE</option>
-                <option>SENTENCE</option>
-                <option>FIXED_NAME</option>
-                <option>UNDEFINED</option>
-                <option>UNDEFINED_ABBR</option>
-                <option>SYNONYM</option>
-            </select><br/>
-                Synonym for word : <input id="synonymtoken" type="text"/>
+                <form>
+                    <div class="form-group">
+                        <label for="popuptoken">Token(s)</label>
+                        <input type="text" disabled="true" class="form-control" id="popuptoken"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="popuptype">Token Type</label>
+                        <select class="form-control" id="popuptype">
+                            <option>WORD</option>
+                            <option>FIXED_NAME</option>
+                            <option>UNDEFINED</option>
+                            <option>UNDEFINED_ABBR</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="popuptype">Use as Synonym</label>
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" id="useAsSynonym" aria-label="Checkbox for following text input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="synonymtokenwrapper">
+                        <label for="popuptoken">Synonym for</label>
+                        <input type="text" class="form-control" id="synonymtoken"/>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" onclick="saveToken()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="documentModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="documentModel1">Edit Original Text</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="popuptoken">Product</label>
+                        <input type="text" disabled="disabled" class="form-control"  id="productcode"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="popuptoken">Original Name</label>
+                        <input type="text" class="form-control" id="originalname"/>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveDocument()">Save changes</button>
             </div>
         </div>
     </div>
@@ -117,6 +187,7 @@
 
 <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" />
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
 
@@ -124,5 +195,9 @@
 <!--script src="/content/main.js"></script-->
 <script src="/content/documents.js"></script>
 
+<div id="spinner-div" class="pt-5">
+    <div class="spinner-border text-primary" role="status">
+    </div>
+</div>
 </body>
 </html>

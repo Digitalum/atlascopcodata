@@ -14,6 +14,7 @@ import java.util.List;
 
 @Entity
 @Data
+//@Table(indexes = @javax.persistence.Index(name = "code_idx", columnList = "code", unique = true))
 @Indexed
 public class Token implements Comparable {
     private static final String SORT_PREFIX = "sort-";
@@ -22,22 +23,28 @@ public class Token implements Comparable {
     public enum TokenType {
         WORD,
         WORD_NOT_TRANSLATABLE,
-        SENTENCE,
         FIXED_NAME,
         UNDEFINED,
-        UNDEFINED_ABBR,
-        SYNONYM
+        UNDEFINED_ABBR
     }
 
     @Fields({
-            @Field(name = "code", analyze = Analyze.YES),
             @Field(name = FACET_PREFIX + "id",  analyze = Analyze.NO),
             @Field(name = SORT_PREFIX + "id", index = Index.NO, analyze = Analyze.NO)
     })
     @SortableField(forField = SORT_PREFIX + "id")
     @Column
+    private long id;
+
+    @Fields({
+           // @Field(name = "code", analyze = Analyze.YES),
+            @Field(name = FACET_PREFIX + "code",  analyze = Analyze.NO),
+            @Field(name = SORT_PREFIX + "code", index = Index.NO, analyze = Analyze.NO)
+    })
+    @SortableField(forField = SORT_PREFIX + "code")
+    @Column
     @Id
-    private String id;
+    private String code;
 
     @Fields({
             @Field(name = "type", analyze = Analyze.YES),
@@ -63,6 +70,20 @@ public class Token implements Comparable {
     @ManyToMany(mappedBy = "tokens")
     private List<TranslationDocument> documents = new ArrayList<>();
 
+
+    @OneToMany(mappedBy="parent" )
+    private List<SynonymTokenGroup> synonymParents = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "tokens")
+    private List<SynonymTokenGroup> synonymGroups = new ArrayList<>();
+
+    /*
+    @ManyToOne
+    @JoinColumn(name="synonymTokenParent", nullable=false)
+    private Token synonymTokenParent;
+*/
+
+
     @Fields({
             @Field(name = "documentCount", analyze = Analyze.NO),
             @Field(name = FACET_PREFIX + "documentCount",  analyze = Analyze.NO),
@@ -77,13 +98,15 @@ public class Token implements Comparable {
 
     }
 
-    public Token(String id, TokenType type) {
-        this.id = id;
+    public Token(String code, TokenType type) {
+        this.code = code;
         this.type = type;
     }
 
-    public Token(String id) {
-        this.id = id;
+    private static int counter = 1000;
+    public Token(String code) {
+        this.id = counter++;
+        this.code = code;
     }
 
 
@@ -96,4 +119,8 @@ public class Token implements Comparable {
         return ((KeywordDto) o).getCount() - this.getCount();
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(this.code);
+    }
 }

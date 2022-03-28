@@ -8,13 +8,7 @@
     <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css}"/>
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
-    <script>
-        $(function () {
-            $("#datepicker").datepicker({
-                dateFormat: "yy-mm-dd"
-            });
-        });
-    </script>
+
     <style>
         span.example {
             color:grey
@@ -83,7 +77,7 @@
                             </ol>
                         </li>
                         <li>
-                            Tokenize : 'X WATER' ->
+                            Tokenize ([space], [(], [.] not followed by number or character) : 'X WATER' ->
                             <div class="keyword UNDEFINED_ABBR">X</div>
                             <div class="keyword UNDEFINED_ABBR">WATER</div>
                         </li>
@@ -185,48 +179,61 @@
 
 <script>
     async function uploadFile() {
+        $('#spinner-div').show();
         let formData = new FormData();
         formData.append("file", fileupload.files[0]);
         let response = await fetch('/upload', {
             method: "POST",
             body: formData
         });
-
+        $('#spinner-div').hide()
         if (response.status == 200) {
             alert("File successfully uploaded.");
         }
     }
 
     async function cleanData() {
+        $('#spinner-div').show();
         let response = await fetch('/cleandata', {
             method: "POST"
         });
-
+        $('#spinner-div').hide()
         if (response.status == 200) {
             alert("Clean data successfully.");
         }
     }
 
     async function exporttokens() {
+        $('#spinner-div').show();
         let response = await fetch('/exportTokens', {
             method: "POST"
         });
-
+        $('#spinner-div').hide()
         if (response.status == 200) {
             alert("Clean data successfully.");
         }
     }
 
     async function exportexcel() {
+        $('#spinner-div').show();
         let response = await fetch('/download', {
             method: "POST"
         });
-
+        $('#spinner-div').hide()
         if (response.status == 200) {
             alert("Export data successfully.");
         }
+
     }
 </script>
 
+<div class="spinner-grow" style="width: 3rem; height: 3rem;" role="status">
+    <span class="sr-only">Loading...</span>
+</div>
+<div id="spinner-div" class="pt-5">
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
 </body>
 </html>

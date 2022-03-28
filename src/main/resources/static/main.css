@@ -39,9 +39,16 @@ body table td, body .table th {
 div.synonynm {
     background-color: #ffeb3b;
     display: inline-block;
-    padding: 1px 5px;
-    font-size: 10pt;
+    padding: 3px 3px;
+    font-size: 7pt;
     border-radius: 5px;
+}
+div.synonynmgroup {
+    background-color: #aaab3b;
+    display: inline-block;
+    padding: 3px 3px;
+    font-size: 10pt;
+    border-radius: 7px;
 }
 
 div.keyword {
@@ -53,7 +60,9 @@ div.keyword {
     color: white;
 }
 
-
+ul.ui-autocomplete.ui-front  {
+    z-index: 9999
+}
 
 div.keyword a {
     text-decoration: none;
@@ -74,9 +83,6 @@ div.keyword.WORD {
     background-color: #8bc34a;
 }
 
-div.keyword.SENTENCE {
-    background-color: #00bcd4;
-}
 div.keyword.FIXED_NAME {
     background-color: #ae9187;
 }
@@ -96,4 +102,16 @@ div.keywordwrapper:after {
 
 span.addkeyword {
     cursor: pointer;
+}
+
+#spinner-div {
+    position: fixed;
+    display: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 1200;
 }
