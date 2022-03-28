@@ -40,17 +40,19 @@ public class TranslationDocument {
 
 
     @Fields({
-            @Field(name = "originalName", analyze = Analyze.YES)
+            @Field(name = "originalName", analyze = Analyze.YES),
+            @Field(name = SORT_PREFIX + "originalName", index = Index.NO, analyze = Analyze.NO)
     })
+    @SortableField(forField = SORT_PREFIX + "originalName")
     @Column
     private String original_name;
 
     @Fields({
-            @Field(name = "newName", analyze = Analyze.YES),
-            @Field(name = FACET_PREFIX + "newName",  analyze = Analyze.NO),
-            @Field(name = SORT_PREFIX + "newName", index = Index.NO, analyze = Analyze.NO)
+            @Field(name = "new_name", analyze = Analyze.YES),
+            @Field(name = FACET_PREFIX + "new_name",  analyze = Analyze.NO),
+            @Field(name = SORT_PREFIX + "new_name", index = Index.NO, analyze = Analyze.NO)
     })
-    @SortableField(forField = SORT_PREFIX + "newName")
+    @SortableField(forField = SORT_PREFIX + "new_name")
     @Column
     private String new_name;
 
@@ -59,14 +61,19 @@ public class TranslationDocument {
 
     @Fields({
             @Field(name = "category", analyze = Analyze.NO),
-            @Field(name = FACET_PREFIX + "category",  analyze = Analyze.NO)
+            @Field(name = FACET_PREFIX + "category",  analyze = Analyze.NO),
+            @Field(name = SORT_PREFIX + "category", index = Index.NO, analyze = Analyze.NO)
     })
+    @SortableField(forField = SORT_PREFIX + "category")
     @Column
     private String category;
 
     @Fields({
-            @Field(name = "brand", analyze = Analyze.NO)
+            @Field(name = "brand", analyze = Analyze.NO),
+            @Field(name = FACET_PREFIX + "brand",  analyze = Analyze.NO),
+            @Field(name = SORT_PREFIX + "brand", index = Index.NO, analyze = Analyze.NO)
     })
+    @SortableField(forField = SORT_PREFIX + "brand")
     @Column
     private String brand;
 
@@ -106,8 +113,10 @@ public class TranslationDocument {
 
     @Fields({
             @Field(name = "value", analyze = Analyze.YES),
-            @Field(name = FACET_PREFIX + "value",  analyze = Analyze.NO)
+            @Field(name = FACET_PREFIX + "value",  analyze = Analyze.NO),
+            @Field(name = SORT_PREFIX + "value", index = Index.NO, analyze = Analyze.NO)
     })
+    @SortableField(forField = SORT_PREFIX + "value")
     public String getValue() {
         if (new_name != null) {
             return new_name;

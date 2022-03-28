@@ -98,7 +98,7 @@ public class SearchService implements ApplicationListener<ApplicationReadyEvent>
         } else {
             Query query = queryBuilder
                     .simpleQueryString()
-                    .onFields("code")
+                    .onFields("code", "new_name", "old_name")
                     .boostedTo(2f).matching(request.getQuery().toLowerCase()).createQuery();
             bool = bool.must(query);
             return bool;

@@ -25,7 +25,8 @@ public class Token implements Comparable {
         SENTENCE,
         FIXED_NAME,
         UNDEFINED,
-        UNDEFINED_ABBR
+        UNDEFINED_ABBR,
+        SYNONYM
     }
 
     @Fields({
