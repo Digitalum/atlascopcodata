@@ -6,6 +6,8 @@ $(document).ready(function () {
     }
 
     $('#documentstable').DataTable({
+        iDisplayLength: 25,
+        lengthMenu: [[10, 25, 50, 100, 250, 1000], [10, 25, 50, 100, 250, 1000]],
         processing: true,
         serverSide: true,
         search: {
@@ -35,7 +37,7 @@ $(document).ready(function () {
             {
                 "data": "original_name",
                 render: function (originalname, type, row) {
-                    return '<span onclick="updateDoc(\'' + originalname + '\' , \'' + row.uuid + '\')" > ' + originalname + '</span>';
+                    return '<span onclick="updateDoc(\'' + encodeURI(originalname) + '\' , \'' + row.code + '\')" > ' + originalname + '</span>';
                 }
             },
             {"data": "new_name"},
@@ -56,6 +58,16 @@ $(document).ready(function () {
             {"data": "category"},
             {"data": "brand"},
             {"data": "changes"}],
+
+        columnDefs: [{
+            targets: 4,
+            createdCell: function (td, cellData, rowData, row, col) {
+                if (rowData.completelyTokenized) {
+                    $(td).css('background-color', '#8bc34a');
+                    $(td).css('color', 'white');
+                }
+            }
+        }],
         "drawCallback": function (settings) {
             reloadDragg();
         }
@@ -117,8 +129,8 @@ function deleteToken(token) {
 var currentTokens = [];
 var currentTokenUuids = [];
 
-function updateDoc(tokenCode, productCode) {
-    $('#originalname').val(tokenCode);
+function updateDoc(value, productCode) {
+    $('#originalname').val(decodeURI(value));
     $('#productcode').val(productCode);
     $('#documentModel').modal('show');
 }

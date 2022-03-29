@@ -2,9 +2,12 @@ package com.atlascopco.data.atlascopcodata.strategies;/*
  * Copyright (c) 2019 Atlas Copco. All rights reserved.
  */
 
+import com.atlascopco.data.atlascopcodata.model.Token;
 import com.atlascopco.data.atlascopcodata.model.TranslationDocument;
 import com.atlascopco.data.atlascopcodata.rules.DataRuleDto;
 import com.atlascopco.data.atlascopcodata.rules.dto.LineWrapper;
+import com.atlascopco.data.atlascopcodata.search.DefaultTokenService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -15,6 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class CleaningStrategy {
+
+    @Autowired
+    private DefaultTokenService tokenService;
 
     public abstract boolean isApplicable(DataRuleDto type);
 
@@ -47,4 +53,40 @@ public abstract class CleaningStrategy {
         StandardEvaluationContext context = new StandardEvaluationContext(lineWrapper);
         return (boolean) exp.getValue(context);
     }
+
+    public Token getOrCreateToken(Map<String, Token> m, String tokenCode1) {
+        Token token;
+        String tokenCode = normalize(tokenCode1);
+        if (m.containsKey(tokenCode)) {
+            token = getToken(m, tokenCode);
+        } else {
+            token = tokenService.getOrCreateTokenByCode(tokenCode);
+            m.put(tokenCode, token);
+        }
+        return token;
+    }
+
+    public Token getOrCreateToken(Map<String, Token> m, Token token) {
+        String tokenCode = normalize(token.getCode());
+        if (m.containsKey(tokenCode)) {
+            token = getToken(m, tokenCode);
+        } else {
+            token = tokenService.getOrCreateTokenByCode(tokenCode);
+            m.put(tokenCode, token);
+        }
+        return token;
+    }
+
+    protected Token getToken(Map<String, Token> m, String token) {
+        if (m.get(normalize(token)) == null) {
+            System.out.println(" Token not found " + token);
+        }
+        return m.get(normalize(token));
+    }
+
+
+    public static String normalize(String code) {
+        return code.trim().toUpperCase();
+    }
+
 }

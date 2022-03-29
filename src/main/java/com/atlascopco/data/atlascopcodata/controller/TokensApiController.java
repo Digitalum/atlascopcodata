@@ -149,7 +149,7 @@ public class TokensApiController {
         final List<Token> synTokens = tokenGroupDto.getTokens().stream().map(x -> tokenService.getOrCreateToken(x)).collect(Collectors.toList());
         synonymTokenGroup.setParent(parentToken1);
         synonymTokenGroup.setTokens(synTokens);
-        if (parentToken1.getType() == null) {
+        if (Token.TokenType.UNDEFINED.equals(parentToken1.getType()) || Token.TokenType.UNDEFINED_ABBR.equals(parentToken1.getType())) {
             parentToken1.setType(tokenGroupDto.getParent().getType());
         }
         tokenRepository.save(parentToken1);

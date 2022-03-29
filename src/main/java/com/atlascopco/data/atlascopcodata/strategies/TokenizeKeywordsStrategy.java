@@ -36,7 +36,6 @@ public class TokenizeKeywordsStrategy extends CleaningStrategy {
             context.put("tokenMap", m);
         }
 
-
         System.out.println("createContext DONE");
         return context;
     }
@@ -49,18 +48,9 @@ public class TokenizeKeywordsStrategy extends CleaningStrategy {
 
             String value = doc.getValue().toUpperCase().trim();
             for (String s : extractWords(value)) {
-                if (!m.containsKey(s)) {
-                    final Token orCreateToken = tokenService.getOrCreateTokenByCode(s);
-                    orCreateToken.setType(getDefaultTokenType(s));
-                    m.put(s, orCreateToken);
-                }
-                Token token = m.get(s);
-                if (token == null) {
-                    System.out.println("                           " + value);
-                    System.out.println("                           " + s);
-                }
-                token.getDocuments().add(doc);
-                doc.getTokens().add(token);
+                final Token token = getOrCreateToken(m, s);
+                //if(token.getT)
+                doc.addToken(token);
             }
         }
     }

@@ -56,7 +56,7 @@ public class DefaultCleansingService {
 
         for (RuleGroupDto rule :  rulesService.getRules()) {
             for (DataRuleDto ruleRule : rule.getRules()) {
-                if ("TRANSLATE".equals(ruleRule.getStrategy())) {
+                if ("TRANSLATION".equals(ruleRule.getStrategy())) {
                     ruleGroupDto.getRules().add(ruleRule);
                 }
             }

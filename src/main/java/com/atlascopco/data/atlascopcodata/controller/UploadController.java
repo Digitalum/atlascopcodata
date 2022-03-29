@@ -3,7 +3,6 @@
  */
 package com.atlascopco.data.atlascopcodata.controller;
 
-import com.atlascopco.data.atlascopcodata.rules.DefaultRulesService;
 import com.atlascopco.data.atlascopcodata.search.DefaultDocumentService;
 import com.atlascopco.data.atlascopcodata.search.DefaultTokenService;
 import com.atlascopco.data.atlascopcodata.services.DefaultExcelService;
@@ -50,7 +49,7 @@ public class UploadController {
 
     @PostMapping("/download")
     public ResponseEntity<?> download() throws Exception {
-        excelService.writeExcel(documentService.getAllDocuments());
+        excelService.exportDocuments(documentService.getAllDocuments());
         return ResponseEntity.ok("File uploaded successfully.");
     }
 

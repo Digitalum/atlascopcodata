@@ -56,6 +56,10 @@ public class DefaultExcelService {
     }
 
     private void createSheet(List<Token> list, Workbook workbook, Token.TokenType tokenType) {
+        final Map<String, String> tokenTranslations = tokenTranslationRepository.findAll().stream()
+                .filter(x -> "nl".equals(x.getKey().getLanguage()))
+                .collect(Collectors.toMap(x -> x.getKey().getTokenCode(), TokenTranslation::getValue));
+
         Sheet sheet = workbook.createSheet(tokenType.toString());
         sheet.setColumnWidth(0, 6000);
         sheet.setColumnWidth(1, 4000);
@@ -98,7 +102,7 @@ public class DefaultExcelService {
                     .collect(Collectors.joining("##")));
 
             headerCell = dataRow.createCell(5);
-            headerCell.setCellValue("TODO");
+            headerCell.setCellValue( translate(token.getCode(),tokenTranslations));
 
             i++;
         }
@@ -110,10 +114,7 @@ public class DefaultExcelService {
         return headerCell;
     }
 
-    public void writeExcel(List<TranslationDocument> list) throws Exception {
-        final Map<String, String> tokenTranslations = tokenTranslationRepository.findAll().stream()
-                .filter(x -> "nl".equals(x.getKey().getLanguage()))
-                .collect(Collectors.toMap(x -> x.getKey().getTokenCode(), TokenTranslation::getValue));
+    public void exportDocuments(List<TranslationDocument> list) throws Exception {
 
         System.out.println("-------------RUN-------------------------------\n");
         Workbook workbook = new XSSFWorkbook();
@@ -154,6 +155,10 @@ public class DefaultExcelService {
         headerCell.setCellValue("NL");
         headerCell.setCellStyle(headerStyle);
 
+        headerCell = header.createCell(5);
+        headerCell.setCellValue("Ready");
+        headerCell.setCellStyle(headerStyle);
+
         int i = 1;
         for (TranslationDocument translationDocument : list) {
 
@@ -175,8 +180,11 @@ public class DefaultExcelService {
             headerCell.setCellStyle(headerStyle);
 
             headerCell = dataRow.createCell(4);
-            final String translated = translationDocument.getTokens().stream().map(x -> translate(x.getCode(), tokenTranslations)).collect(Collectors.joining(" "));
-            headerCell.setCellValue(translated);
+            headerCell.setCellValue(translationDocument.getNewNameTranslated());
+            headerCell.setCellStyle(headerStyle);
+
+            headerCell = dataRow.createCell(5);
+            headerCell.setCellValue(translationDocument.isCompletelyTokenized());
             headerCell.setCellStyle(headerStyle);
 
             i++;
@@ -197,7 +205,7 @@ public class DefaultExcelService {
         if (m.containsKey(value)) {
             return m.get(value);
         }
-        return value;
+        return '[' + value + ']';
     }
 
 

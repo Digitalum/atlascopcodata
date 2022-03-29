@@ -101,6 +101,22 @@ public class TranslationDocument {
     )
     private List<Token> tokens = new ArrayList<>();
 
+    public void addToken(Token token) {
+        tokens.add(token);
+        token.getDocuments().add(this);
+    }
+
+    public void removeToken(Token token) {
+        tokens.remove(token);
+        token.getDocuments().remove(this);
+    }
+
+    public void removeAllTokens() {
+        for (Token token : tokens) {
+            token.getDocuments().remove(this);
+        }
+        tokens.removeAll(tokens);
+    }
 
     @FieldBridge(impl = RulesFieldBridge.class)
     @ElementCollection
@@ -127,7 +143,7 @@ public class TranslationDocument {
     })
     @SortableField(forField = SORT_PREFIX + "value")
     public String getValue() {
-        if (new_name != null) {
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(new_name)) {
             return new_name;
         }
         return original_name;

@@ -2,6 +2,8 @@ $(document).ready(function () {
 
 
     $('#tokenstable').DataTable({
+        iDisplayLength: 25,
+        lengthMenu: [[10, 25, 50, 100, 250, 1000], [10, 25, 50, 100, 250, 1000]],
         processing: true,
         serverSide: true,
         search: {
@@ -68,7 +70,7 @@ $(document).ready(function () {
                     var a = "";
                     $(data).each(function (index, s) {
                         a += ' <div class="synonynm">'
-                        a +=  s.parent.code;
+                        a += s.parent.code;
                         a += '</div>';
                     });
 

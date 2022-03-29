@@ -8,7 +8,6 @@ import com.atlascopco.data.atlascopcodata.model.SynonymTokenGroup;
 import com.atlascopco.data.atlascopcodata.model.Token;
 import com.atlascopco.data.atlascopcodata.model.TranslationDocument;
 import com.atlascopco.data.atlascopcodata.rules.DataRuleDto;
-import com.atlascopco.data.atlascopcodata.search.DefaultTokenService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,8 +24,6 @@ public class SynonymsTokenStrategy extends CleaningStrategy {
 
     @Autowired
     private TranslationDocumentRepository documentRepository;
-    @Autowired
-    private DefaultTokenService tokenService;
 
     @Override
     public boolean isApplicable(DataRuleDto type) {
@@ -53,8 +50,12 @@ public class SynonymsTokenStrategy extends CleaningStrategy {
         boolean hasReplacements = false;
         hasReplacements = replaceSynonymTokens(doc.getTokens(), newTokenList, hasReplacements, 10, m);
         if (hasReplacements) {
-            doc.setTokens(new ArrayList<>());
-            doc.getTokens().addAll(newTokenList);
+            doc.removeAllTokens();
+            for (Token token : newTokenList) {
+                doc.addToken(token);
+            }
+
+            //doc.getTokens().addAll(newTokenList);
             //System.out.println(doc.getTokens());
             documentRepository.save(doc);
         }
@@ -118,25 +119,5 @@ public class SynonymsTokenStrategy extends CleaningStrategy {
         return hasReplacements;
     }
 
-    private Token getOrCreateToken(Map<String, Token> m, Token token) {
-        String tokenCode = normalize(token.getCode());
-        if (m.containsKey(tokenCode)) {
-            token = getToken(m, tokenCode);
-        } else {
-            token = tokenService.getOrCreateTokenByCode(tokenCode);
-            m.put(tokenCode, token);
-        }
-        return token;
-    }
 
-    private Token getToken(Map<String, Token> m, String token) {
-        if (m.get(normalize(token)) == null) {
-            System.out.println(" Token not found " + token);
-        }
-        return m.get(normalize(token));
-    }
-
-    private static String normalize(String code) {
-        return code.trim().toUpperCase();
-    }
 }
