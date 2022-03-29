@@ -11,6 +11,7 @@ import org.hibernate.search.annotations.Index;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -29,15 +30,18 @@ public class Token implements Comparable {
     }
 
     @Fields({
-            @Field(name = FACET_PREFIX + "id",  analyze = Analyze.NO),
-            @Field(name = SORT_PREFIX + "id", index = Index.NO, analyze = Analyze.NO)
+            @Field(name = "uuid", analyze = Analyze.YES),
+            @Field(name = FACET_PREFIX + "uuid",  analyze = Analyze.NO),
+            @Field(name = SORT_PREFIX + "uuid", index = Index.NO, analyze = Analyze.NO)
     })
-    @SortableField(forField = SORT_PREFIX + "id")
+    @SortableField(forField = SORT_PREFIX + "uuid")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="token_sequence")
+    @SequenceGenerator(name="token_sequence", sequenceName = "token_sequence", allocationSize = 100)
     @Column
-    private long id;
+    private String uuid;
 
     @Fields({
-           // @Field(name = "code", analyze = Analyze.YES),
+            @Field(name = "code2", analyze = Analyze.YES),
             @Field(name = FACET_PREFIX + "code",  analyze = Analyze.NO),
             @Field(name = SORT_PREFIX + "code", index = Index.NO, analyze = Analyze.NO)
     })
@@ -95,17 +99,17 @@ public class Token implements Comparable {
     }
 
     public Token() {
-
+        this.uuid = UUID.randomUUID().toString();
     }
 
     public Token(String code, TokenType type) {
+        this.uuid = UUID.randomUUID().toString();
         this.code = code;
         this.type = type;
     }
 
-    private static int counter = 1000;
     public Token(String code) {
-        this.id = counter++;
+        this.uuid = UUID.randomUUID().toString();
         this.code = code;
     }
 

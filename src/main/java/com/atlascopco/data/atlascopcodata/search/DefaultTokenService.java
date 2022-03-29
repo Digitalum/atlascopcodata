@@ -11,6 +11,7 @@ import com.atlascopco.data.atlascopcodata.dto.TokenDto;
 import com.atlascopco.data.atlascopcodata.model.Token;
 import com.atlascopco.data.atlascopcodata.search.search.SearchRequest;
 import com.atlascopco.data.atlascopcodata.search.search.SearchResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -61,15 +62,21 @@ public class DefaultTokenService {
 
 
     public Token getOrCreateToken(TokenDto tokenDto) {
-        if (tokenDto.getId() != 0) {
+        if (StringUtils.isEmpty(tokenDto.getUuid())) {
             return tokenRepository.findById(tokenDto.getCode()).orElse(new Token(tokenDto.getCode()));
         } else {
             return tokenRepository.findById(tokenDto.getCode().trim().toUpperCase()).orElse(new Token(tokenDto.getCode().trim().toUpperCase()));
         }
     }
+    public Token getTokenByUuid(String uuid) {
+        return tokenRepository.findByUuid(uuid).get();
+    }
+    public Token getTokenByCode(String code) {
+        return tokenRepository.findByCode(code).get();
+    }
 
     public Token getOrCreateToken(Token token) {
-        if (token.getId() != 0) {
+        if (StringUtils.isEmpty(token.getUuid())) {
             return tokenRepository.findById(token.getCode()).orElse(new Token(token.getCode()));
         } else {
             return tokenRepository.findById(token.getCode().trim().toUpperCase()).orElse(new Token(token.getCode().trim().toUpperCase()));

@@ -40,7 +40,7 @@
 
 <h1>
     Token
-    <span th:text="${token.id}"></span>(<span th:text="${token.type}"></span>)
+    <span th:text="${token.code}"></span>(<span th:text="${token.type}"></span>)
 </h1>
 <h2>
     Synonyms
@@ -56,7 +56,7 @@
     Token Parents
 </h4>
 <td class="synonyms">
-    <a th:each="s : ${token.synonymGroups}" th:href="${'/tokens/detail/' + s.parent}">
+    <a th:each="s : ${token.synonymGroups}" th:href="${'/tokens/detail/' + s.parent.uuid}">
         <div class="synonynm" th:text="${s.parent}"></div>
         <span>(-)</span>
     </a>
@@ -65,7 +65,7 @@
     Used in Synonym Tokens
 </h4>
 <div class="synonynmgroup" th:each="s : ${token.synonymParents}">
-    <a th:each="s : ${s.tokens}" th:href="${'/tokens/detail/' + s}">
+    <a th:each="s : ${s.tokens}" th:href="${'/tokens/detail/' + s.uuid}">
         <div class="synonynm" th:text="${s}"></div>
     </a>
     <span>(-)</span>

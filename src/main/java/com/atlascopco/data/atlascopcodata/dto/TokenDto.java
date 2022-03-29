@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class TokenDto {
     private int count;
     private int documentCount;
-    private long id;
+    private String uuid;
     private String code;
     private Token.TokenType type; // UNDEFINED, DEFINED, FIXED
     private List<String> synonyms = new ArrayList<>(); // Replacements
@@ -24,8 +24,8 @@ public class TokenDto {
     public TokenDto() {
     }
 
-    public TokenDto(long id, String code) {
-        this.id = id;
+    public TokenDto(String uuid, String code) {
+        this.uuid = uuid;
         this.code = code;
     }
     public TokenDto( String code) {
@@ -33,7 +33,7 @@ public class TokenDto {
     }
 
     public TokenDto(Token token) {
-        this.id = token.getId();
+        this.uuid = token.getUuid();
         this.code = token.getCode();
         this.type = token.getType();
         this.count = token.getCount();

@@ -37,16 +37,16 @@ public class DefaultCleansingService {
 
 
     @Transactional
-    public void executeCleaningRules2(List<TranslationDocument> docs) throws Exception {
-        executeCleaningRules(docs);
+    public void executeCleaningRules(List<TranslationDocument> docs) throws Exception {
+        executeCleaningRulesInternal(docs);
     }
 
     @Transactional
     public void executeCleaningRules() throws Exception {
-        executeCleaningRules(translationDocumentRepository.findAll());
+        executeCleaningRulesInternal(translationDocumentRepository.findAll());
     }
 
-    public void executeCleaningRules(List<TranslationDocument> docs) throws Exception {
+    protected void executeCleaningRulesInternal(List<TranslationDocument> docs) throws Exception {
 
         System.out.println("Execute Cleaning Rules");
         final List<RuleGroupDto> rules = rulesService.getRules();

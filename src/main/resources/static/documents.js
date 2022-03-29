@@ -31,7 +31,7 @@ $(document).ready(function () {
             {
                 "data": "original_name",
                 render: function (originalname, type, row) {
-                    return '<span onclick="updateDoc(\'' + originalname + '\' , \'' + row.code + '\')" > ' + originalname + '</span>';
+                    return '<span onclick="updateDoc(\'' + originalname + '\' , \'' + row.uuid + '\')" > ' + originalname + '</span>';
                 }
             },
             {"data": "new_name"},
@@ -40,8 +40,8 @@ $(document).ready(function () {
                 render: function (tokens, type) {
                     var a = "";
                     $(tokens).each(function (index, token) {
-                        a += '<div class="keyword ' + token.type + '"><a href="' + token.id + '">' + token.id + '</a>' +
-                            '<span class="addkeyword" onclick="updateToken([\'' + token.id + '\'], \'' + token.type + '\')">(+)</span> </div>';
+                        a += '<div class="keyword ' + token.type + '"><a href="' + token.uuid + '">' + token.code + '</a>' +
+                            '<span class="addkeyword" uuid="' + token.uuid + '" onclick="updateToken([\'' + token.code + '\'],[\'' + token.uuid + '\'], \'' + token.type + '\')">(+)</span> </div>';
                     });
 
                     return a;
@@ -72,10 +72,12 @@ function reloadDragg() {
                     keywordwrapper = droppable.parent();
                     keywordwrapper.on("click", function () {
                         var sentence = [];
+                        var tokenIds = [];
                         $(this).find("a").each(function (x, value) {
                             sentence.push($(this).text());
+                            tokenIds.push($(this).text());
                         })
-                        updateToken(sentence, "WORD");
+                        updateToken(sentence, tokenIds, "WORD");
                     });
                 }
                 draggable.appendTo(keywordwrapper);
@@ -107,6 +109,7 @@ function deleteToken(token) {
 }
 
 var currentTokens = [];
+var currentTokenUuids = [];
 
 function updateDoc(tokenCode, productCode) {
     $('#originalname').val(tokenCode);
@@ -114,7 +117,7 @@ function updateDoc(tokenCode, productCode) {
     $('#documentModel').modal('show');
 }
 
-function updateToken(tokens, type) {
+function updateToken(tokens, tokenIds, type) {
     if (type == 'UNDEFINED') {
         type = 'WORD';
     }
@@ -122,6 +125,7 @@ function updateToken(tokens, type) {
         type = 'FIXED_NAME';
     }
     currentTokens = tokens;
+    currentTokenUuids = tokenIds;
     $('#popuptype').val(type);
     if (tokens.length > 1) {
         $('#popuptoken').val('[' + tokens.join('] [') + ']');
@@ -131,6 +135,7 @@ function updateToken(tokens, type) {
         $('#synonymtokenwrapper').show();
     } else {
         $('#popuptoken').val(tokens.join());
+        $('#popuptokenUuid').val(tokenIds.join());
         $('#useAsSynonym').prop('checked', false)
         $('#useAsSynonym').prop("disabled", false);
         $('#synonymtokenwrapper').show();
@@ -160,12 +165,20 @@ $(document).ready(function () {
 function saveToken() {
     if ($('#useAsSynonym').prop('checked')) {
         $('#spinner-div').show();
+        var tokenDtos = [];
+        for (const currentToken of currentTokens) {
+            tokenDtos.push({
+                code: currentToken
+            });
+        }
         $.ajax({
             url: "/tokens/tokengroup/add",
             data: JSON.stringify({
-                parent: $('#synonymtoken').val(),
+                parent: {
+                    code: $('#synonymtoken').val()
+                },
                 parentType: 'WORD',
-                tokens: currentTokens
+                tokens: tokenDtos
             }),
             type: 'POST',
             contentType: 'application/json; charset=utf-8',
@@ -182,7 +195,12 @@ function saveToken() {
         $('#spinner-div').show();
         $.ajax({
             url: "/tokens/token",
-            data: JSON.stringify({id: null, code: $('#popuptoken').val(), type: $('#popuptype').val()}),
+            data: JSON.stringify({
+                    uuid: $('#popuptokenUuid').val(),
+                    code: $('#popuptoken').val(),
+                    type: $('#popuptype').val()
+                }
+            ),
             type: 'POST',
             contentType: 'application/json; charset=utf-8',
             dataType: 'json', // added data type

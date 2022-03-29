@@ -33,6 +33,7 @@ public class SynonymsTokenStrategy extends CleaningStrategy {
 
     @Override
     public void clean(TranslationDocument doc, DataRuleDto ruleRule, Map<String, Object> ctx) {
+        System.out.println("AAAAAAAAAAAAAAA");
         //if (isRuleTriggered(doc, ruleRule.getTrigger(), ctx)) {
         List<Token> newTokenList = new ArrayList<>();
         boolean hasReplacements = false;
@@ -46,6 +47,8 @@ public class SynonymsTokenStrategy extends CleaningStrategy {
 
     private boolean replaceSynonymTokens(List<Token> oldTokenList, List<Token> newTokenList, boolean hasReplacements, int count) {
         boolean hasReplacementInCurrentIteration = false;
+        System.out.println(count);
+        System.out.println("--> " + oldTokenList.size());
         if (count <= 0) {
             return hasReplacements;
         }
@@ -56,6 +59,9 @@ public class SynonymsTokenStrategy extends CleaningStrategy {
             token = tokenService.getOrCreateToken(token);
             final List<SynonymTokenGroup> allByTokensIn = token.getSynonymGroups();
 
+            System.out.println(token.getCode() + " - " + token.getSynonymGroups());
+            System.out.println(token.getCode() + " - " + token.getSynonymParents());
+
             if (CollectionUtils.isNotEmpty(allByTokensIn)) {
                 boolean isReplaced = false;
                 for (SynonymTokenGroup synonymParent : allByTokensIn) {
@@ -65,10 +71,15 @@ public class SynonymsTokenStrategy extends CleaningStrategy {
                         StringBuilder builder = new StringBuilder();
 
                         for (int a = i; a < i + tokenCount; a++) {
-                            builder.append(oldTokenList.get(a).getId());
+                            builder.append(oldTokenList.get(a).getCode());
                         }
 
+                        System.out.println("-------------------");
+                        System.out.println(tokenkey);
+                        System.out.println(builder.toString());
                         if (tokenkey.equals(builder.toString())) {
+
+                            System.out.println("MATCH");
                             newTokenList.add(synonymParent.getParent());
                             i += tokenCount - 1;
                             hasReplacements = true;

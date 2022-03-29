@@ -49,9 +49,9 @@ public class SynonymsTokenStrategyTest {
         synonymsTokenStrategy.clean(translationDocument, null, null);
 
         assertEquals(3, translationDocument.getTokens().size());
-        assertEquals("XAS187", translationDocument.getTokens().get(0).getId());
-        assertEquals("555", translationDocument.getTokens().get(1).getId());
-        assertEquals("666", translationDocument.getTokens().get(2).getId());
+        assertEquals("XAS187", translationDocument.getTokens().get(0).getCode());
+        assertEquals("555", translationDocument.getTokens().get(1).getCode());
+        assertEquals("666", translationDocument.getTokens().get(2).getCode());
     }
 
 }

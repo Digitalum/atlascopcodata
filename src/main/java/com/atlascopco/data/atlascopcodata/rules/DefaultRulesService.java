@@ -48,7 +48,7 @@ public class DefaultRulesService {
     public void saveSynonyms(String fileName, List<Token> synonymDtoList) throws IOException {
         String str = synonymDtoList.stream()
                 //     .filter(x -> !x.isGenerated())
-                .map(x -> x.getId() + "=" + x.getSynonyms().stream().collect(Collectors.joining(","))).collect(Collectors.joining("\n"));
+                .map(x -> x.getCode() + "=" + x.getSynonyms().stream().collect(Collectors.joining(","))).collect(Collectors.joining("\n"));
         BufferedWriter writer = new BufferedWriter(new FileWriter("config/" + fileName));
         writer.write(str);
         writer.close();

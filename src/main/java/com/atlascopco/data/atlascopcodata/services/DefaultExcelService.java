@@ -4,6 +4,7 @@
 package com.atlascopco.data.atlascopcodata.services;
 
 import com.atlascopco.data.atlascopcodata.dao.TranslationDocumentRepository;
+import com.atlascopco.data.atlascopcodata.model.Token;
 import com.atlascopco.data.atlascopcodata.model.TranslationDocument;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
@@ -47,6 +48,83 @@ public class DefaultExcelService {
             e.printStackTrace();
         }
         return m;
+    }
+
+    public void exportTokens(List<Token> list) throws Exception {
+        System.out.println("-------------RUN-------------------------------\n");
+        Workbook workbook = new XSSFWorkbook();
+
+        createSheet(list, workbook);
+
+
+        File currDir = new File(".");
+        String path = currDir.getAbsolutePath();
+        String fileLocation = path.substring(0, path.length() - 1) + "tokens.xlsx";
+
+        System.out.println(path);
+        FileOutputStream outputStream = new FileOutputStream(fileLocation);
+        workbook.write(outputStream);
+        workbook.close();
+    }
+
+    private void createSheet(List<Token> list, Workbook workbook) {
+        Sheet sheet = workbook.createSheet("WORD");
+        sheet.setColumnWidth(0, 6000);
+        sheet.setColumnWidth(1, 4000);
+
+        Row header = sheet.createRow(0);
+
+        CellStyle headerStyle = workbook.createCellStyle();
+        //headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        XSSFFont font = ((XSSFWorkbook) workbook).createFont();
+        font.setFontName("Arial");
+        font.setFontHeightInPoints((short) 16);
+        font.setBold(true);
+        headerStyle.setFont(font);
+
+        Cell headerCell = header.createCell(0);
+        headerCell.setCellValue("Code");
+        headerCell = header.createCell(1);
+        headerCell.setCellValue("Count");
+        headerCell = header.createCell(2);
+        headerCell.setCellValue("Type");
+        headerCell = header.createCell(3);
+        headerCell.setCellValue("Replacements");
+        headerCell = header.createCell(4);
+        headerCell.setCellValue("Synonym Groups");
+        headerCell = header.createCell(5);
+        headerCell.setCellValue("Translation NL");
+
+        int i = 1;
+        for (Token token : list) {
+            Row dataRow = sheet.createRow(i);
+            headerCell = dataRow.createCell(0);
+            headerCell.setCellValue(token.getCode());
+            headerCell.setCellStyle(headerStyle);
+
+            headerCell = dataRow.createCell(1);
+            headerCell.setCellValue(token.getCount());
+            headerCell.setCellStyle(headerStyle);
+
+            headerCell = dataRow.createCell(2);
+            headerCell.setCellValue(token.getType().toString());
+            headerCell.setCellStyle(headerStyle);
+
+            headerCell = dataRow.createCell(3);
+            headerCell.setCellValue(token.getSynonyms().stream().collect(Collectors.joining(",")));
+            headerCell.setCellStyle(headerStyle);
+
+            headerCell = dataRow.createCell(4);
+            headerCell.setCellValue(token.getSynonymGroups().stream()
+                    .map(x -> x.getTokens().stream().map(Token::getCode).collect(Collectors.joining("::")))
+                    .collect(Collectors.joining("##")));
+            headerCell.setCellStyle(headerStyle);
+
+
+            i++;
+        }
     }
 
     public void writeExcel(List<TranslationDocument> list) throws Exception {

@@ -21,8 +21,8 @@ public class SynonymTokenGroupDto {
     }
 
     public SynonymTokenGroupDto(SynonymTokenGroup synonymTokenGroup) {
-        this.parent = new TokenDto(synonymTokenGroup.getParent().getId(), synonymTokenGroup.getParent().getCode());
+        this.parent = new TokenDto(synonymTokenGroup.getParent().getUuid(), synonymTokenGroup.getParent().getCode());
         this.parentType = synonymTokenGroup.getParent().getType().toString();
-        this.tokens = synonymTokenGroup.getTokens().stream().map(x -> new TokenDto(x.getId(), x.getCode())).collect(Collectors.toList());
+        this.tokens = synonymTokenGroup.getTokens().stream().map(x -> new TokenDto(x.getUuid(), x.getCode())).collect(Collectors.toList());
     }
 }

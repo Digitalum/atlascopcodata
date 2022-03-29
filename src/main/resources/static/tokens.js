@@ -28,11 +28,10 @@ $(document).ready(function () {
 
         "columns": [
             {
-                "data": "id",
-                render: function (id, type, row, meta) {
-                    return '<div class="keyword ' + row.type + '"><a href="/tokens/detail/' + id + '" >' + id + ' </a></div>';
+                "data": "uuid",
+                render: function (uuid, type, row, meta) {
+                    return '<div class="keyword ' + row.type + '"><a href="/tokens/detail/' + uuid + '" >' + row.code + ' </a></div>';
                 }
-
             },
             {"data": "documentCount"},
             {"data": "type"},

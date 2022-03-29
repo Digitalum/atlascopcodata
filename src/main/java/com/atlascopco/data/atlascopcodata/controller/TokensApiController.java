@@ -75,7 +75,7 @@ public class TokensApiController {
         final Token token1 = tokenService.getOrCreateToken(tokenDto);
         token1.setType(tokenDto.getType());
         tokenRepository.save(token1);
-        regenerateForToken(tokenDto.getCode());
+        regenerateForToken(tokenDto.getUuid());
     }
 
     @PostMapping("/keywords/synonym")
@@ -133,9 +133,7 @@ public class TokensApiController {
     @PostMapping("/tokens/tokengroup/add")
     public @ResponseBody
     void addTokenGroup(@RequestBody SynonymTokenGroupDto tokenGroupDto) throws Exception {
-        final String parentCode = tokenGroupDto.getParent().getCode();
-
-        String tokenGroupCode = tokenGroupDto.getTokens().stream().map(x -> x.getCode()).collect(Collectors.joining("-"));
+        String tokenGroupCode = tokenGroupDto.getTokens().stream().map(TokenDto::getCode).collect(Collectors.joining("-"));
         tokenGroupCode = tokenGroupCode.toUpperCase();
         final SynonymTokenGroup synonymTokenGroup = synonymTokenRepository.findById(tokenGroupCode).orElse(new SynonymTokenGroup(tokenGroupCode));
 
@@ -148,14 +146,14 @@ public class TokensApiController {
         }
         tokenRepository.save(parentToken1);
         tokenRepository.saveAll(synTokens);
-        synonymTokenRepository.saveAndFlush(synonymTokenGroup);
+        synonymTokenRepository.save(synonymTokenGroup);
 
-        final String s = tokenGroupDto.getTokens().get(0).getCode();
-        regenerateForToken(s);
+        final String tokenUuid = synonymTokenGroup.getTokens().get(0).getUuid();
+        regenerateForToken(tokenUuid);
     }
 
-    private void regenerateForToken(String s) throws Exception {
-        final List<TranslationDocument> documentsForKeyword = documentService.getDocumentsForKeyword(s);
+    private void regenerateForToken(String uuid) throws Exception {
+        final List<TranslationDocument> documentsForKeyword = documentService.getDocumentsForKeyword(uuid);
         cleansingService.resetDocuments(documentsForKeyword);
         cleansingService.executeCleaningRules(documentsForKeyword);
     }

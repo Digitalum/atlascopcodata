@@ -43,12 +43,9 @@ public class DocumentsController {
     }
 
 
-    @GetMapping("/tokens/detail/{token}")
-    public String getKeywordDetail(Model model, @PathVariable String token,
-                                   @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-                                   @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
-        final List<TranslationDocument> documents = documentService.getDocumentsForKeyword(token);
-        final Token orCreateToken = tokenService.getOrCreateToken(new TokenDto(token));
+    @GetMapping("/tokens/detail/{tokenId}")
+    public String getKeywordDetail(Model model, @PathVariable String tokenId) {
+        final Token orCreateToken = tokenService.getTokenByUuid(tokenId);
         model.addAttribute("token", orCreateToken);
 
         return "tokendetail";
