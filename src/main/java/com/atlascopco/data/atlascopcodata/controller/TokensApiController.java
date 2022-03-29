@@ -95,7 +95,7 @@ public class TokensApiController {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.setPageable(PageRequest.of(pageNumber, size, Sort.by(defaultOrder)));
         searchRequest.setEntity(Token.class);
-        searchRequest.setQuery(term);
+        searchRequest.setQuery(term + "*");
 
         return tokenService.getPagedTokens(searchRequest).getPage().getContent().stream().map(TokenDto::getCode).collect(Collectors.toList());
     }
@@ -104,17 +104,25 @@ public class TokensApiController {
     public @ResponseBody
     void deleteToken(@RequestBody TokenDto tokenDto) throws Exception {
         final Token token1 = tokenService.getOrCreateToken(tokenDto);
-        final List<TranslationDocument> documentsForKeyword = documentService.getDocumentsForKeyword(token1.getCode());
+        if (token1 != null) {
+            final List<TranslationDocument> documentsForKeyword = documentService.getDocumentsTokenUUid(token1.getUuid());
 
-        cleansingService.resetDocuments(documentsForKeyword);
-        translationDocumentRepository.saveAll(documentsForKeyword);
+            cleansingService.resetDocuments(documentsForKeyword);
+            translationDocumentRepository.saveAll(documentsForKeyword);
 
-        synonymTokenRepository.deleteAll(token1.getSynonymParents());
-        synonymTokenRepository.deleteAll(token1.getSynonymGroups());
-        tokenRepository.delete(token1);
+            synonymTokenRepository.deleteAll(token1.getSynonymParents());
+            synonymTokenRepository.deleteAll(token1.getSynonymGroups());
 
 
-        cleansingService.executeCleaningRules(documentsForKeyword);
+
+            cleansingService.executeCleaningRules(documentsForKeyword);
+            if (token1.getDocuments().size() == 0) {
+                tokenRepository.delete(token1);
+            } else {
+                token1.setType(Token.TokenType.UNDEFINED);
+                tokenRepository.save(token1);
+            }
+        }
     }
 
 
@@ -142,7 +150,7 @@ public class TokensApiController {
         synonymTokenGroup.setParent(parentToken1);
         synonymTokenGroup.setTokens(synTokens);
         if (parentToken1.getType() == null) {
-            parentToken1.setType(Token.TokenType.valueOf(tokenGroupDto.getParentType()));
+            parentToken1.setType(tokenGroupDto.getParent().getType());
         }
         tokenRepository.save(parentToken1);
         tokenRepository.saveAll(synTokens);
@@ -153,7 +161,7 @@ public class TokensApiController {
     }
 
     private void regenerateForToken(String uuid) throws Exception {
-        final List<TranslationDocument> documentsForKeyword = documentService.getDocumentsForKeyword(uuid);
+        final List<TranslationDocument> documentsForKeyword = documentService.getDocumentsTokenUUid(uuid);
         cleansingService.resetDocuments(documentsForKeyword);
         cleansingService.executeCleaningRules(documentsForKeyword);
     }

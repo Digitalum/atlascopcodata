@@ -18,9 +18,11 @@ public class TranslationDocumentDto {
     private final List<TokenDto> tokens;
     private final String original_name;
     private final String new_name;
+    private final String newNameTranslated;
     private final String value;
     private final List<String> changes;
     private final String brand;
+    private final boolean completelyTokenized;
 
     public TranslationDocumentDto(TranslationDocument translationDocument) {
         this.id = translationDocument.getId();
@@ -32,5 +34,7 @@ public class TranslationDocumentDto {
         this.changes = translationDocument.getChanges();
         this.brand = translationDocument.getBrand();
         this.category = translationDocument.getCategory();
+        this.newNameTranslated = translationDocument.getNewNameTranslated();
+        this.completelyTokenized = translationDocument.isCompletelyTokenized();
     }
 }

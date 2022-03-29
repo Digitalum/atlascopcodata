@@ -48,4 +48,27 @@ public class DocumentsApiController {
         return documentService.getPagedDocuments(searchRequest);
     }
 
+    @RequestMapping(path = "/api2/documents", method = RequestMethod.POST)
+    public @ResponseBody
+    Paged<TranslationDocumentDto> getTokensAllPost(
+            @RequestBody PagingRequest pagingRequest) {
+        final int size = pagingRequest.getLength();
+        final int pageNumber = pagingRequest.getStart() / size;
+
+        Sort.Order defaultOrder = new Sort.Order(Sort.Direction.DESC, "code");
+        for (Order order : pagingRequest.getOrder()) {
+            final String fieldName = pagingRequest.getColumns().get(order.getColumn()).getData();
+            defaultOrder = new Sort.Order(Sort.Direction.fromString(order.getDir().toString()), fieldName);
+        }
+        SearchRequest searchRequest = new SearchRequest();
+        searchRequest.setPageable(PageRequest.of(pageNumber, size, Sort.by(defaultOrder)));
+        searchRequest.setEntity(TranslationDocument.class);
+
+        if (StringUtils.isNotEmpty(pagingRequest.getSearch().getValue())) {
+            searchRequest.setQuery(pagingRequest.getSearch().getValue());
+        }
+
+        return documentService.getPagedDocuments(searchRequest);
+    }
+
 }

@@ -5,7 +5,9 @@ package com.atlascopco.data.atlascopcodata.controller;
 
 import com.atlascopco.data.atlascopcodata.rules.DefaultRulesService;
 import com.atlascopco.data.atlascopcodata.search.DefaultDocumentService;
+import com.atlascopco.data.atlascopcodata.search.DefaultTokenService;
 import com.atlascopco.data.atlascopcodata.services.DefaultExcelService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.InputStream;
 
+@Log4j2
 @Controller
 public class UploadController {
     @Value("${spring.application.name}")
@@ -27,9 +30,9 @@ public class UploadController {
     @Autowired
     private DefaultExcelService excelService;
     @Autowired
-    private DefaultRulesService rulesService;
-    @Autowired
     private DefaultDocumentService documentService;
+    @Autowired
+    private DefaultTokenService tokenService;
 
 
     @PostMapping("/upload")
@@ -37,8 +40,7 @@ public class UploadController {
         String fileName = file.getOriginalFilename();
         try {
             InputStream inputStream = new BufferedInputStream(file.getInputStream());
-            excelService.loadExcel(inputStream);
-            rulesService.importTokens();
+            excelService.importProductsExcel(inputStream);
             file.transferTo(new File("C:\\upload\\" + fileName));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -49,6 +51,46 @@ public class UploadController {
     @PostMapping("/download")
     public ResponseEntity<?> download() throws Exception {
         excelService.writeExcel(documentService.getAllDocuments());
+        return ResponseEntity.ok("File uploaded successfully.");
+    }
+
+
+    @PostMapping("/tokens/export")
+    public ResponseEntity<?> exportTokens() throws Exception {
+        excelService.exportTokens(tokenService.getAllTokens());
+        return ResponseEntity.ok("File uploaded successfully.");
+    }
+
+    @PostMapping("/tokens2/import")
+    public ResponseEntity<?> importTokens() throws Exception {
+        return ResponseEntity.ok("File uploaded successfully.");
+    }
+
+
+    @PostMapping("/tokens/import")
+    public ResponseEntity<?> importTokens(@RequestParam("file") MultipartFile file) {
+        String fileName = file.getOriginalFilename();
+        try {
+            InputStream inputStream = new BufferedInputStream(file.getInputStream());
+            excelService.importTokensExcel(inputStream);
+            file.transferTo(new File("C:\\upload\\" + fileName));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        return ResponseEntity.ok("File uploaded successfully.");
+    }
+
+    @PostMapping("/tokens/translations/import")
+    public ResponseEntity<?> importTranslationsTokens(@RequestParam("file") MultipartFile file) {
+        String fileName = file.getOriginalFilename();
+        try {
+            InputStream inputStream = new BufferedInputStream(file.getInputStream());
+            excelService.importTokensExcel(inputStream);
+            file.transferTo(new File("C:\\upload\\" + fileName));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
         return ResponseEntity.ok("File uploaded successfully.");
     }
 }

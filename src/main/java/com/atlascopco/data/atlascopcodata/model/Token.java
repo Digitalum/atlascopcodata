@@ -81,12 +81,6 @@ public class Token implements Comparable {
     @ManyToMany(mappedBy = "tokens")
     private List<SynonymTokenGroup> synonymGroups = new ArrayList<>();
 
-    /*
-    @ManyToOne
-    @JoinColumn(name="synonymTokenParent", nullable=false)
-    private Token synonymTokenParent;
-*/
-
 
     @Fields({
             @Field(name = "documentCount", analyze = Analyze.NO),
@@ -111,6 +105,7 @@ public class Token implements Comparable {
     public Token(String code) {
         this.uuid = UUID.randomUUID().toString();
         this.code = code;
+        this.type = TokenType.UNDEFINED;
     }
 
 

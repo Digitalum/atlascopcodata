@@ -13,7 +13,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,35 +34,52 @@ public class SynonymsTokenStrategy extends CleaningStrategy {
     }
 
     @Override
+    public Map<String, Object> createContext(Map<String, Object> ctx, DataRuleDto ruleRule) {
+        final Map<String, Object> context = super.createContext(ctx, ruleRule);
+        if (!ctx.containsKey("tokenMap")) {
+            final Map<String, Token> m = new HashMap<>();// tokenService.getAllTokens().stream().collect(Collectors.toMap(Token::getCode, y -> y));
+            context.put("tokenMap", m);
+        }
+
+        System.out.println("createContext DONE");
+        return context;
+    }
+
+    @Transactional
+    @Override
     public void clean(TranslationDocument doc, DataRuleDto ruleRule, Map<String, Object> ctx) {
-        System.out.println("AAAAAAAAAAAAAAA");
-        //if (isRuleTriggered(doc, ruleRule.getTrigger(), ctx)) {
+        final Map<String, Token> m = (Map<String, Token>) ctx.get("tokenMap");
         List<Token> newTokenList = new ArrayList<>();
         boolean hasReplacements = false;
-        hasReplacements = replaceSynonymTokens(doc.getTokens(), newTokenList, hasReplacements, 10);
+        hasReplacements = replaceSynonymTokens(doc.getTokens(), newTokenList, hasReplacements, 10, m);
         if (hasReplacements) {
             doc.setTokens(new ArrayList<>());
             doc.getTokens().addAll(newTokenList);
+            //System.out.println(doc.getTokens());
             documentRepository.save(doc);
         }
     }
 
-    private boolean replaceSynonymTokens(List<Token> oldTokenList, List<Token> newTokenList, boolean hasReplacements, int count) {
+    private boolean replaceSynonymTokens(List<Token> oldTokenList, List<Token> newTokenList, boolean hasReplacements, int count, Map<String, Token> m) {
         boolean hasReplacementInCurrentIteration = false;
-        System.out.println(count);
-        System.out.println("--> " + oldTokenList.size());
         if (count <= 0) {
             return hasReplacements;
         }
+
+        //System.out.println(oldTokenList);
         count--;
         for (int i = 0; i < oldTokenList.size(); i++) {
             Token token = oldTokenList.get(i);
+            if (token == null || token.getCode() == null) {
+                System.out.println(count);
+                System.out.println(token);
+                System.out.println(token.getUuid());
+                System.out.println(token.getType());
+                System.out.println(token.getCode());
+            }
+            token = getOrCreateToken(m, token);
 
-            token = tokenService.getOrCreateToken(token);
             final List<SynonymTokenGroup> allByTokensIn = token.getSynonymGroups();
-
-            System.out.println(token.getCode() + " - " + token.getSynonymGroups());
-            System.out.println(token.getCode() + " - " + token.getSynonymParents());
 
             if (CollectionUtils.isNotEmpty(allByTokensIn)) {
                 boolean isReplaced = false;
@@ -74,13 +93,8 @@ public class SynonymsTokenStrategy extends CleaningStrategy {
                             builder.append(oldTokenList.get(a).getCode());
                         }
 
-                        System.out.println("-------------------");
-                        System.out.println(tokenkey);
-                        System.out.println(builder.toString());
                         if (tokenkey.equals(builder.toString())) {
-
-                            System.out.println("MATCH");
-                            newTokenList.add(synonymParent.getParent());
+                            newTokenList.add(getOrCreateToken(m, synonymParent.getParent()));
                             i += tokenCount - 1;
                             hasReplacements = true;
                             isReplaced = true;
@@ -90,17 +104,39 @@ public class SynonymsTokenStrategy extends CleaningStrategy {
                     }
                 }
                 if (!isReplaced) {
-                    newTokenList.add(token);
+                    newTokenList.add(getOrCreateToken(m, token));
                 }
             } else {
-                newTokenList.add(token);
+                newTokenList.add(getOrCreateToken(m, token));
             }
         }
         if (hasReplacementInCurrentIteration) {
             oldTokenList = new ArrayList<>(newTokenList);
             newTokenList.clear();
-            replaceSynonymTokens(oldTokenList, newTokenList, hasReplacements, count);
+            replaceSynonymTokens(oldTokenList, newTokenList, hasReplacements, count, m);
         }
         return hasReplacements;
+    }
+
+    private Token getOrCreateToken(Map<String, Token> m, Token token) {
+        String tokenCode = normalize(token.getCode());
+        if (m.containsKey(tokenCode)) {
+            token = getToken(m, tokenCode);
+        } else {
+            token = tokenService.getOrCreateTokenByCode(tokenCode);
+            m.put(tokenCode, token);
+        }
+        return token;
+    }
+
+    private Token getToken(Map<String, Token> m, String token) {
+        if (m.get(normalize(token)) == null) {
+            System.out.println(" Token not found " + token);
+        }
+        return m.get(normalize(token));
+    }
+
+    private static String normalize(String code) {
+        return code.trim().toUpperCase();
     }
 }

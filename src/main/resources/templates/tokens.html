@@ -5,6 +5,7 @@
     <title>Spring Boot Thymeleaf Application - Bootstrap Pagination</title>
 
     <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css}"/>
+    <link th:rel="stylesheet" th:href="@{/webjars/font-awesome/6.1.0/css/all.css} "/>
     <link rel="stylesheet" href="/content/main.css"/>
 </head>
 <body>
@@ -29,7 +30,7 @@
                     <a class="nav-link" href="/tokens">Tokens</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Translations</a>
+                    <a class="nav-link" href="/documents">Documents</a>
                 </li>
             </ul>
         </div>
@@ -42,7 +43,7 @@
             <table id="tokenstable" class="table table-bordered table-responsive-sm table-sm">
                 <thead>
                 <tr>
-                    <th>Token</th>
+                    <th>Token </th>
                     <th>Usage Count</th>
                     <th>Type</th>
                     <th>Word Replacements</th>

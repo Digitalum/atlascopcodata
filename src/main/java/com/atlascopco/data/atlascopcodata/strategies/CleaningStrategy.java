@@ -18,8 +18,8 @@ public abstract class CleaningStrategy {
 
     public abstract boolean isApplicable(DataRuleDto type);
 
-    public Map<String, Object> createContext(DataRuleDto ruleRule) {
-        return new HashMap<>();
+    public Map<String, Object> createContext(Map<String, Object> ctx, DataRuleDto ruleRule) {
+        return ctx;
     }
 
     ;

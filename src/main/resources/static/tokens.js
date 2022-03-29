@@ -40,7 +40,7 @@ $(document).ready(function () {
                 render: function (data, type) {
                     var a = "";
                     $(data).each(function (index, s) {
-                        a += ' <div class="synonynm">' + s + '</div>';
+                        a += ' <div class="synonynm">' + s.code + '</div>';
                     });
 
                     return a;
@@ -54,7 +54,7 @@ $(document).ready(function () {
                         a += ' <div class="synonynmgroup">'
                         $(s.tokens).each(function (index, s) {
                             a += ' <div class="synonynm">'
-                            a += s + " ";
+                            a += s.code + " ";
                             a += '</div>';
                         });
                         a += '</div>'
@@ -68,7 +68,7 @@ $(document).ready(function () {
                     var a = "";
                     $(data).each(function (index, s) {
                         a += ' <div class="synonynm">'
-                        a +=  s.parent;
+                        a +=  s.parent.code;
                         a += '</div>';
                     });
 

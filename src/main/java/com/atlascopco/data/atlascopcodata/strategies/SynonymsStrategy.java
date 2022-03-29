@@ -27,8 +27,8 @@ public class SynonymsStrategy extends CleaningStrategy {
     }
 
     @Override
-    public Map<String, Object> createContext(DataRuleDto ruleRule) {
-        final Map<String, Object> context = super.createContext(ruleRule);
+    public Map<String, Object> createContext(Map<String, Object> ctx,DataRuleDto ruleRule) {
+        final Map<String, Object> context = super.createContext(ctx, ruleRule);
         List<Token> allSys = new ArrayList<>();
         Map<String, Token> m = new HashMap<>();
         for (FileSynonymDto file : ruleRule.getFiles()) {
@@ -69,15 +69,6 @@ public class SynonymsStrategy extends CleaningStrategy {
                 }
             }
         }
-    }
-
-    @Deprecated
-    private void generateReverseSynonym(Token sentence) {
-        final List<String> strings = new ArrayList<>(Arrays.asList(sentence.getCode().split(" ")));
-        Collections.reverse(strings);
-        String reversed = String.join(" ", strings);
-        //sentence.setGenerated(true);
-        sentence.getSynonyms().add(reversed);
     }
 
     public String replaceSynonym(String oldValue, String s2, String newValue) {

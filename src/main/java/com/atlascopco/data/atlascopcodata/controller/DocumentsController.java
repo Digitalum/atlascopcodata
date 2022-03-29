@@ -25,15 +25,7 @@ public class DocumentsController {
     String appName;
 
     @Autowired
-    private DefaultCleansingService cleansingService;
-    @Autowired
-    private TokenRepository tokenRepository;
-    @Autowired
-    private DefaultDocumentService documentService;
-    @Autowired
     private DefaultTokenService tokenService;
-    @Autowired
-    private DefaultRulesService rulesService;
 
 
     @GetMapping("/documents")

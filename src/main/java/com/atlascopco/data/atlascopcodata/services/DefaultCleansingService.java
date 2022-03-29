@@ -38,21 +38,36 @@ public class DefaultCleansingService {
 
     @Transactional
     public void executeCleaningRules(List<TranslationDocument> docs) throws Exception {
-        executeCleaningRulesInternal(docs);
+        final List<RuleGroupDto> rules = rulesService.getRules();
+        executeCleaningRulesInternal(rules, docs);
     }
 
     @Transactional
     public void executeCleaningRules() throws Exception {
-        executeCleaningRulesInternal(translationDocumentRepository.findAll());
+        final List<RuleGroupDto> rules = rulesService.getRules();
+        executeCleaningRulesInternal(rules, translationDocumentRepository.findAll());
     }
 
-    protected void executeCleaningRulesInternal(List<TranslationDocument> docs) throws Exception {
+    @Transactional
+    public void executeTranslationRules() throws Exception {
+        final List<RuleGroupDto> rules = new ArrayList<>();
+        final RuleGroupDto ruleGroupDto = new RuleGroupDto();
+        rules.add(ruleGroupDto);
 
+        for (RuleGroupDto rule :  rulesService.getRules()) {
+            for (DataRuleDto ruleRule : rule.getRules()) {
+                if ("TRANSLATE".equals(ruleRule.getStrategy())) {
+                    ruleGroupDto.getRules().add(ruleRule);
+                }
+            }
+        }
+
+        executeCleaningRulesInternal(rules, translationDocumentRepository.findAll());
+    }
+
+    protected void executeCleaningRulesInternal(List<RuleGroupDto> rules, List<TranslationDocument> docs) throws Exception {
+        final Map<String, Object> ctx1 = new HashMap<>();
         System.out.println("Execute Cleaning Rules");
-        final List<RuleGroupDto> rules = rulesService.getRules();
-        Map<String, KeywordDto> m = null;
-        List<SynonymDto> synonyms = null;
-        //ctx.put()
         for (RuleGroupDto rule : rules) {
             for (DataRuleDto ruleRule : rule.getRules()) {
                 int j = 0;
@@ -63,10 +78,9 @@ public class DefaultCleansingService {
                         cleaningStrategy = cleaningStrategy1;
                     }
                 }
-
                 int i = 0;
                 if (cleaningStrategy != null) {
-                    final Map<String, Object> ctx = cleaningStrategy.createContext(ruleRule);
+                    final Map<String, Object> ctx = cleaningStrategy.createContext(ctx1, ruleRule);
                     for (TranslationDocument doc : docs) {
                         j++;
                         if (j % 1000 == 0) {
@@ -79,12 +93,6 @@ public class DefaultCleansingService {
                             i++;
                             translationDocumentRepository.save(doc);
                         }
-                    }
-                    if (ctx.containsKey("sentencesM")) {
-                        m = (Map<String, KeywordDto>) ctx.get("sentencesM");
-                    }
-                    if (ctx.containsKey("sentences")) {
-                        synonyms = (List<SynonymDto>) ctx.get("sentences");
                     }
                 }
                 System.out.println();

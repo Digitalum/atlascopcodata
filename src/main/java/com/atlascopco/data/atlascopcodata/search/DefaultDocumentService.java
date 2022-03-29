@@ -30,7 +30,7 @@ public class DefaultDocumentService {
         return translationDocumentRepository.findByCode(token).get();
     }
 
-    public List<TranslationDocument> getDocumentsForKeyword(String tokenId) {
+    public List<TranslationDocument> getDocumentsTokenUUid(String tokenId) {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.setEntity(TranslationDocument.class);
         searchRequest.setPageable(PageRequest.of(0, 5000));

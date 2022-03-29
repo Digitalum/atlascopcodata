@@ -25,37 +25,37 @@ class DefaultCleansingServiceTest {
 
     @Test
     void extractWords() {
-        List<String> values = tokenizeKeywordsStrategy.extractWords("P.E. GENERATOR", Collections.emptyList());
+        List<String> values = tokenizeKeywordsStrategy.extractWords("P.E. GENERATOR");
         assertEquals("P.", values.get(0));
         assertEquals("E.", values.get(1));
         assertEquals("GENERATOR", values.get(2));
-        values = tokenizeKeywordsStrategy.extractWords("test 123.abc", Collections.emptyList());
+        values = tokenizeKeywordsStrategy.extractWords("test 123.abc");
         assertEquals("test", values.get(0));
         assertEquals("123.", values.get(1));
         assertEquals("abc", values.get(2));
-        values = tokenizeKeywordsStrategy.extractWords("o-ring test-test", Collections.emptyList());
+        values = tokenizeKeywordsStrategy.extractWords("o-ring test-test");
         assertEquals("o-ring", values.get(0));
         assertEquals("test-test", values.get(1));
-        values = tokenizeKeywordsStrategy.extractWords("test BALL BEARING", Collections.singletonList(new Token("BALL BEARING")));
+        values = tokenizeKeywordsStrategy.extractWords("test BALL BEARING");
         assertEquals("test", values.get(0));
         assertEquals("BALL BEARING", values.get(1));
-        values = tokenizeKeywordsStrategy.extractWords("BEARING(+)Test", Collections.emptyList());
+        values = tokenizeKeywordsStrategy.extractWords("BEARING(+)Test");
         assertEquals("BEARING", values.get(0));
         assertEquals("(+)", values.get(1));
         assertEquals("Test", values.get(2));
-        values = tokenizeKeywordsStrategy.extractWords("FRAME BOX2.2 MB", Collections.emptyList());
+        values = tokenizeKeywordsStrategy.extractWords("FRAME BOX2.2 MB");
         assertEquals("FRAME", values.get(0));
         assertEquals("BOX2.", values.get(1));
         assertEquals("2", values.get(2));
         assertEquals("MB", values.get(3));
-        values = tokenizeKeywordsStrategy.extractWords("BEARING(+)", Collections.singletonList(new Token("(+)")));
+        values = tokenizeKeywordsStrategy.extractWords("BEARING(+)");
         assertEquals("BEARING", values.get(0));
         assertEquals("(+)", values.get(1));
     }
 
     @Test
     void extractWordsFixedSentence() {
-        List<String> values = tokenizeKeywordsStrategy.extractWords("test BAll BEARING", Collections.singletonList(new Token("BALL BEARing")));
+        List<String> values = tokenizeKeywordsStrategy.extractWords("test BAll BEARING");
         assertEquals("test", values.get(0));
         assertEquals("BALL BEARing", values.get(1));
     }

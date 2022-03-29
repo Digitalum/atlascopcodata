@@ -39,41 +39,6 @@
     </div>
 </nav>
 
-<h1>
-    Token
-    <span th:text="${token.code}"></span>(<span th:text="${token.type}"></span>)
-</h1>
-<h2>
-    Synonyms
-</h2>
-
-<h4>
-    Word Replacements
-</h4>
-<td class="synonyms">
-    <div class="synonynm" th:each="s : ${token.synonyms}" th:text="${s}"></div>
-</td>
-<h4>
-    Token Parents
-</h4>
-<td class="synonyms">
-    <a th:each="s : ${token.synonymGroups}" th:href="${'/tokens/detail/' + s.parent.uuid}">
-        <div class="synonynm" th:text="${s.parent}"></div>
-        <span><i class="fa-solid fa-circle-minus"></i></span>
-    </a>
-</td>
-<h4>
-    Used in Synonym Tokens
-</h4>
-<div class="synonynmgroup" th:each="s : ${token.synonymParents}">
-    <a th:each="s : ${s.tokens}" th:href="${'/tokens/detail/' + s.uuid}">
-        <div class="synonynm" th:text="${s}"></div>
-    </a>
-    <span><i class="fa-solid fa-circle-minus"></i></span>
-</div>
-
-<button type="button" style="float:right" onclick="deleteCurrentToken()" class="btn btn-danger">Delete</button>
-
 <h2>
     Products
 </h2>
@@ -143,6 +108,7 @@
                         <label for="popuptoken">Synonym for</label>
                         <input type="text" class="form-control" id="synonymtoken"/>
                     </div>
+
 
                     <div class="form-group" id="invertSynonymwrapper">
                         <label for="popuptype">Include Inverte Synonym</label>

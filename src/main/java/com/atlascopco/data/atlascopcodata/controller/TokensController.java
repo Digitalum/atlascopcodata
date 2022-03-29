@@ -3,10 +3,6 @@
  */
 package com.atlascopco.data.atlascopcodata.controller;
 
-import com.atlascopco.data.atlascopcodata.dao.TokenRepository;
-import com.atlascopco.data.atlascopcodata.rules.DefaultRulesService;
-import com.atlascopco.data.atlascopcodata.search.DefaultDocumentService;
-import com.atlascopco.data.atlascopcodata.search.DefaultTokenService;
 import com.atlascopco.data.atlascopcodata.services.DefaultCleansingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,16 +20,12 @@ public class TokensController {
 
     @Autowired
     private DefaultCleansingService cleansingService;
-    @Autowired
-    private DefaultRulesService rulesService;
 
 
     @GetMapping("/tokens")
     public String getTokens(Model model,
                             @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
                             @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
-
-
         return "tokens";
     }
 
@@ -43,19 +35,28 @@ public class TokensController {
 
     @PostMapping("/cleandata")
     public ResponseEntity<?> startCleaning() throws Exception {
-        if (!inprogress) {
-            inprogress = true;
-            cleansingService.resetDocuments();
-            cleansingService.executeCleaningRules();
+        try {
+            if (!inprogress) {
+                inprogress = true;
+                cleansingService.resetDocuments();
+                cleansingService.executeCleaningRules();
+            }
+            return ResponseEntity.ok("File uploaded successfully.");
+        } finally {
+            inprogress = false;
         }
-        return ResponseEntity.ok("File uploaded successfully.");
     }
 
-    @PostMapping("/exportTokens")
-    public ResponseEntity<?> exportTokens() {
-        rulesService.exportTokens();
-        return ResponseEntity.ok("File uploaded successfully.");
+    @PostMapping("/updatetranslations")
+    public ResponseEntity<?> updateTranslations() throws Exception {
+        try {
+            if (!inprogress) {
+                inprogress = true;
+                cleansingService.executeTranslationRules();
+            }
+            return ResponseEntity.ok("File uploaded successfully.");
+        } finally {
+            inprogress = false;
+        }
     }
-
-
 }

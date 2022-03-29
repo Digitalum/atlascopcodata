@@ -65,10 +65,9 @@
         "files": []
       },
       {
-        "code": "Proper Casing",
+        "code": "Translate Tokens",
         "trigger": "true",
-        "strategy": "REGEX",
-        "regex": "value.trim()"
+        "strategy": "TRANSLATION"
       }
     ]
   }

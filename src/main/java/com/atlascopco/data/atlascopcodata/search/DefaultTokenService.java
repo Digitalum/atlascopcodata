@@ -52,7 +52,6 @@ public class DefaultTokenService {
     }
 
     public Paged<TokenDto> getPagedTokens(SearchRequest searchRequest) {
-
         final SearchResponse<Token> search = searchService.search(searchRequest);
         final List<TokenDto> tokendDtos = search.getResult().stream().map(x -> new TokenDto(x)).collect(Collectors.toList());
         final PageImpl<TokenDto> page = new PageImpl<>(tokendDtos, searchRequest.getPageable(), search.getResultSize());
@@ -62,32 +61,38 @@ public class DefaultTokenService {
 
 
     public Token getOrCreateToken(TokenDto tokenDto) {
-        if (StringUtils.isEmpty(tokenDto.getUuid())) {
-            return tokenRepository.findById(tokenDto.getCode()).orElse(new Token(tokenDto.getCode()));
+        if (!StringUtils.isEmpty(tokenDto.getUuid())) {
+            return tokenRepository.findByUuid(tokenDto.getUuid()).orElse(null);
         } else {
             return tokenRepository.findById(tokenDto.getCode().trim().toUpperCase()).orElse(new Token(tokenDto.getCode().trim().toUpperCase()));
         }
     }
-    public Token getTokenByUuid(String uuid) {
-        return tokenRepository.findByUuid(uuid).get();
-    }
-    public Token getTokenByCode(String code) {
-        return tokenRepository.findByCode(code).get();
-    }
 
     public Token getOrCreateToken(Token token) {
         if (StringUtils.isEmpty(token.getUuid())) {
-            return tokenRepository.findById(token.getCode()).orElse(new Token(token.getCode()));
+            return tokenRepository.findByUuid(token.getUuid()).orElse(new Token(token.getCode()));
         } else {
             return tokenRepository.findById(token.getCode().trim().toUpperCase()).orElse(new Token(token.getCode().trim().toUpperCase()));
         }
     }
 
-    public Token getOrCreateToken(String token) {
+    public Token getTokenByUuid(String uuid) {
+        return tokenRepository.findByUuid(uuid).get();
+    }
+
+    public Token getTokenByCode(String code) {
+        return tokenRepository.findById(code.trim().toUpperCase()).orElse(null);
+    }
+
+    public Token getOrCreateTokenByCode(String token) {
         return tokenRepository.findById(token.trim().toUpperCase()).orElse(new Token(token.trim().toUpperCase()));
     }
 
     public List<Token> getTokens(Token.TokenType type) {
         return tokenRepository.findAllByType(type);
+    }
+
+    public List<Token> getAllTokens() {
+        return tokenRepository.findAll();
     }
 }
