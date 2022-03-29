@@ -9,9 +9,14 @@ import com.atlascopco.data.atlascopcodata.dao.TokenRepository;
 import com.atlascopco.data.atlascopcodata.dto.KeywordDto;
 import com.atlascopco.data.atlascopcodata.dto.TokenDto;
 import com.atlascopco.data.atlascopcodata.model.Token;
+import com.atlascopco.data.atlascopcodata.model.TranslationDocument;
+import com.atlascopco.data.atlascopcodata.search.search.SearchFacet;
+import com.atlascopco.data.atlascopcodata.search.search.SearchFacetValue;
 import com.atlascopco.data.atlascopcodata.search.search.SearchRequest;
 import com.atlascopco.data.atlascopcodata.search.search.SearchResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.search.query.engine.spi.FacetManager;
+import org.hibernate.search.query.facet.Facet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +36,23 @@ public class DefaultTokenService {
     private SearchService searchService;
     @Autowired
     private TokenRepository tokenRepository;
+
+    public SearchFacet getFacets( ) {
+        SearchRequest searchRequest = new SearchRequest();
+        searchRequest.setEntity(Token.class);
+        searchRequest.setPageable(PageRequest.of(0, 100));
+        final FacetManager facetManager = searchService.searchFacets(searchRequest);
+        return getFacet(facetManager, "type");
+    }
+
+    private SearchFacet getFacet(FacetManager facetManager, String facet) {
+        List<SearchFacetValue> facetResult = facetManager.getFacets(facet)
+                .stream().map(f -> new SearchFacetValue(f.getValue(), f.getCount())).collect(Collectors.toList());
+        SearchFacet searchFacet = new SearchFacet(facet, facet);
+        searchFacet.getFacetValues().addAll(facetResult);
+        return searchFacet;
+    }
+
 
     public List<KeywordDto> getTokens() {
         SearchRequest searchRequest = new SearchRequest();

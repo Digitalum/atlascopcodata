@@ -9,12 +9,17 @@ import com.atlascopco.data.atlascopcodata.controller.paging.datatable.PagingRequ
 import com.atlascopco.data.atlascopcodata.dto.TranslationDocumentDto;
 import com.atlascopco.data.atlascopcodata.model.TranslationDocument;
 import com.atlascopco.data.atlascopcodata.search.DefaultDocumentService;
+import com.atlascopco.data.atlascopcodata.search.search.SearchFacet;
 import com.atlascopco.data.atlascopcodata.search.search.SearchRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.search.query.facet.Facet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class DocumentsApiController {
@@ -71,4 +76,9 @@ public class DocumentsApiController {
         return documentService.getPagedDocuments(searchRequest);
     }
 
+    @GetMapping("/documents/facets")
+    public @ResponseBody
+    SearchFacet getFacets(Model model) {
+        return documentService.getFacets();
+    }
 }

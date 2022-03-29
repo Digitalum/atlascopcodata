@@ -31,8 +31,11 @@ $(document).ready(function () {
         "columns": [
             {
                 "data": "uuid",
-                render: function (uuid, type, row, meta) {
-                    return '<div class="keyword ' + row.type + '"><a href="/tokens/detail/' + uuid + '" >' + row.code + ' </a></div>';
+                render: function (uuid, type, token, meta) {
+                    a = '<div class="keyword ' + token.type + '"><a href="/tokens/detail/' + token.uuid + '">' + token.code + '</a>' +
+                        '<span class="addkeyword" uuid="' + token.uuid + '" onclick="updateToken([\'' + token.code + '\'],[\'' + token.uuid + '\'], \'' + token.type + '\')"> <i class="fa-solid fa-pen"></i></span> </div>';
+
+                    return a;//'<div class="keyword ' + row.type + '"><a href="/tokens/detail/' + uuid + '" >' + row.code + ' </a></div>';
                 }
             },
             {"data": "documentCount"},

@@ -16,9 +16,11 @@ import com.atlascopco.data.atlascopcodata.model.Token;
 import com.atlascopco.data.atlascopcodata.model.TranslationDocument;
 import com.atlascopco.data.atlascopcodata.search.DefaultDocumentService;
 import com.atlascopco.data.atlascopcodata.search.DefaultTokenService;
+import com.atlascopco.data.atlascopcodata.search.search.SearchFacet;
 import com.atlascopco.data.atlascopcodata.search.search.SearchRequest;
 import com.atlascopco.data.atlascopcodata.services.DefaultCleansingService;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.search.query.facet.Facet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -164,5 +166,12 @@ public class TokensApiController {
         final List<TranslationDocument> documentsForKeyword = documentService.getDocumentsTokenUUid(uuid);
         cleansingService.resetDocuments(documentsForKeyword);
         cleansingService.executeCleaningRules(documentsForKeyword);
+    }
+
+
+    @GetMapping("/tokens/facets")
+    public @ResponseBody
+    SearchFacet getFacets(Model model) {
+        return tokenService.getFacets();
     }
 }

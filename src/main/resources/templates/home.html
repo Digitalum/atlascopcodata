@@ -12,7 +12,7 @@
 
     <style>
         span.example {
-            color:grey
+            color: grey
         }
     </style>
 </head>
@@ -103,7 +103,8 @@
                     <label for="fileupload">Choose a Excel:</label>
                     <input type="file" id="fileupload" name="fileupload"
                            accept="application/msexcel,application/vnd.ms-excel,application/x-msexcel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-                    <button type="button" class="btn btn-primary" id="upload-button" onclick="uploadFile()"> Import Products
+                    <button type="button" class="btn btn-primary" id="upload-button" onclick="uploadFile()"> Import
+                        Products
                     </button>
 
 
@@ -113,7 +114,6 @@
                             Export Products
                         </button>
                     </div>
-
 
 
                 </div>
@@ -130,7 +130,8 @@
                     <label for="tokensupload">Choose a Excel:</label>
                     <input type="file" id="tokensupload" name="tokensupload"
                            accept="application/msexcel,application/vnd.ms-excel,application/x-msexcel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-                    <button type="button" class="btn btn-primary" id="tokensupload-button" onclick="importTokens()"> Import Tokens
+                    <button type="button" class="btn btn-primary" id="tokensupload-button" onclick="importTokens()">
+                        Import Tokens
                     </button>
 
                     <div style="background-color: #efffcb;padding: 20px;">
@@ -139,6 +140,30 @@
                             Export Tokens
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="padding: 1.5rem;margin-right: 0;margin-left: 0;border-width: 0.2rem;">
+
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Documents</h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                        card's content.</p>
+                    <canvas id="documentGraph" width="400" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Tokens</h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                        card's content.</p>
+                    <canvas id="tokensGraph" width="400" height="250"></canvas>
                 </div>
             </div>
         </div>
@@ -158,7 +183,8 @@
                     </div>
                     <div style="background-color: #efcbff;padding: 20px;">
                         <label for="clean-button">Start Stranslating</label>
-                        <button type="button" class="btn btn-primary" id="clean-button" onclick="translateData()"> Translate
+                        <button type="button" class="btn btn-primary" id="clean-button" onclick="translateData()">
+                            Translate
                         </button>
                     </div>
                 </div>
@@ -168,10 +194,101 @@
 </div>
 </div>
 
+
 <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
 <script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
 <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"
+        integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+<script>
+    $(document).ready(function () {
+var borderColors = [
+    'rgba(255, 99, 132, 1)',
+    'rgba(54, 162, 235, 1)',
+    'rgba(255, 206, 86, 1)',
+    'rgba(75, 192, 192, 1)',
+    'rgba(153, 102, 255, 1)',
+    'rgba(255, 159, 64, 1)'
+];
+var backgroundColors = [
+    'rgba(255, 99, 132, 0.2)',
+    'rgba(54, 162, 235, 0.2)',
+    'rgba(255, 206, 86, 0.2)',
+    'rgba(75, 192, 192, 0.2)',
+    'rgba(153, 102, 255, 0.2)',
+    'rgba(255, 159, 64, 0.2)'
+];
+        $.ajax({
+            url: "/documents/facets",
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json', // added data type
+            success: function (res) {
+                console.log(res);
+                res.facetValues
+                var dataLabels = res.facetValues.map(a => a.value);
+                var data1 = res.facetValues.map(a => a.count);
+                const ctx = document.getElementById('documentGraph').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: dataLabels,
+                        datasets: [{
+                            label: '# of Product Names',
+                            data: data1,
+                            backgroundColor: backgroundColors,
+                            borderColor: borderColors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            },
+        });
+
+$.ajax({
+            url: "/tokens/facets",
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json', // added data type
+            success: function (res) {
+                var dataLabels = res.facetValues.map(a => a.value);
+                var data1 = res.facetValues.map(a => a.count);
+                const ctx = document.getElementById('tokensGraph').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: dataLabels,
+                        datasets: [{
+                            label: '# of Product Names',
+                            data: data1,
+                            backgroundColor: backgroundColors,
+                            borderColor: borderColors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            },
+        });
+
+
+    });
+</script>
 
 <script>
     async function uploadFile() {
@@ -198,6 +315,7 @@
             alert("Clean data successfully.");
         }
     }
+
     async function translateData() {
         $('#spinner-div').show();
         let response = await fetch('/updatetranslations', {

@@ -34,6 +34,7 @@ public class Token implements Comparable {
             @Field(name = FACET_PREFIX + "uuid",  analyze = Analyze.NO),
             @Field(name = SORT_PREFIX + "uuid", index = Index.NO, analyze = Analyze.NO)
     })
+    @Facet(forField = FACET_PREFIX + "uuid")
     @SortableField(forField = SORT_PREFIX + "uuid")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="token_sequence")
     @SequenceGenerator(name="token_sequence", sequenceName = "token_sequence", allocationSize = 100)
@@ -50,14 +51,22 @@ public class Token implements Comparable {
     @Id
     private String code;
 
+    @FieldBridge(impl = TokenTypeFieldBridge.class)
     @Fields({
             @Field(name = "type", analyze = Analyze.YES),
-            @Field(name = FACET_PREFIX + "type",  analyze = Analyze.NO),
             @Field(name = SORT_PREFIX + "type", index = Index.NO, analyze = Analyze.NO)
     })
     @SortableField(forField = SORT_PREFIX + "type")
     @Column
     private TokenType type; // UNDEFINED, DEFINED, FIXED
+
+    @Fields({
+            @Field(name = FACET_PREFIX + "type",  analyze = Analyze.NO)
+    })
+    @Facet(forField = FACET_PREFIX + "type")
+    private String getType2() {
+        return type.toString();
+    }
 
 
     @Fields({

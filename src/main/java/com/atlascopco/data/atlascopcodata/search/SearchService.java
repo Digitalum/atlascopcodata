@@ -105,20 +105,21 @@ public class SearchService implements ApplicationListener<ApplicationReadyEvent>
         }
     }
 
-    public FacetManager searchFacetsForPgc(SearchRequest request, String pgc) {
+    public FacetManager searchFacets(SearchRequest request) {
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
         QueryBuilder queryBuilder = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(request.getEntity()).get();
         BooleanJunction bool = queryBuilder.bool().must(queryBuilder.all().createQuery());
 
-        if (!StringUtils.isEmpty(pgc)) {
-            bool = bool.must(queryBuilder.keyword().onField("pgc").matching(pgc).createQuery());
-        }
-
         FullTextQuery fullTextQuery = fullTextEntityManager.createFullTextQuery(bool.createQuery(), request.getEntity());
         fullTextQuery.setFirstResult(0);
         fullTextQuery.setMaxResults(0);
-        addFacets(queryBuilder, fullTextQuery, new String[]{"pgc", "gac", "brand", "factory",
-                "division", "businessline", "range", "rg", "emissionregulation", "commercialfamily", "modelname"});
+
+        if (Token.class.equals(request.getEntity())) {
+            addFacets(queryBuilder, fullTextQuery, new String[]{"type"});
+        } else {
+
+            addFacets(queryBuilder, fullTextQuery, new String[]{"completelyTokenized"});
+        }
 
         log.info(((FullTextQueryImpl) fullTextQuery).getQueryString());
 

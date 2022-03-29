@@ -151,12 +151,19 @@ public class TranslationDocument {
 
     @Fields({
             @Field(name = "completelyTokenized", analyze = Analyze.YES),
-            @Field(name = FACET_PREFIX + "completelyTokenized", analyze = Analyze.NO),
             @Field(name = SORT_PREFIX + "completelyTokenized", index = Index.NO, analyze = Analyze.NO)
     })
     @SortableField(forField = SORT_PREFIX + "completelyTokenized")
     public boolean isCompletelyTokenized() {
         return !tokens.stream().anyMatch(x -> !Token.TokenType.FIXED_NAME.equals(x.getType()) && !Token.TokenType.WORD.equals(x.getType()));
+    }
+
+    @Fields({
+            @Field(name = FACET_PREFIX + "completelyTokenized", analyze = Analyze.NO),
+    })
+    @Facet(forField = FACET_PREFIX + "completelyTokenized")
+    public String isCompletelyTokenized2() {
+        return !tokens.stream().anyMatch(x -> !Token.TokenType.FIXED_NAME.equals(x.getType()) && !Token.TokenType.WORD.equals(x.getType())) ? "TRUE": "FALSE";
     }
 
     public String getAttr(String name) {

@@ -3,19 +3,15 @@
  */
 package com.atlascopco.data.atlascopcodata.controller;
 
-import com.atlascopco.data.atlascopcodata.dao.TokenRepository;
-import com.atlascopco.data.atlascopcodata.dto.TokenDto;
 import com.atlascopco.data.atlascopcodata.model.Token;
-import com.atlascopco.data.atlascopcodata.model.TranslationDocument;
-import com.atlascopco.data.atlascopcodata.rules.DefaultRulesService;
-import com.atlascopco.data.atlascopcodata.search.DefaultDocumentService;
 import com.atlascopco.data.atlascopcodata.search.DefaultTokenService;
-import com.atlascopco.data.atlascopcodata.services.DefaultCleansingService;
+import org.hibernate.search.query.facet.Facet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -35,11 +31,4 @@ public class DocumentsController {
     }
 
 
-    @GetMapping("/tokens/detail/{tokenId}")
-    public String getKeywordDetail(Model model, @PathVariable String tokenId) {
-        final Token orCreateToken = tokenService.getTokenByUuid(tokenId);
-        model.addAttribute("token", orCreateToken);
-
-        return "tokendetail";
-    }
 }
