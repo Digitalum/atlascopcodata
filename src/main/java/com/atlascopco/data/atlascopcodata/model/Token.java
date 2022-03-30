@@ -65,6 +65,11 @@ public class Token implements Comparable {
     })
     @Facet(forField = FACET_PREFIX + "type")
     private String getType2() {
+        if (TokenType.UNDEFINED.equals(type) || TokenType.UNDEFINED_ABBR.equals(type)) {
+            if (getDocumentCount() == 0) {
+                return "OTHER";
+            }
+        }
         return type.toString();
     }
 

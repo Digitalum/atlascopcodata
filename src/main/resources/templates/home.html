@@ -51,41 +51,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Process</h5>
-                    <p class="card-text"></p>
-                    <ol>
-                        <li>
-                            Preprocessing
-                            <ol>
-                                <li>
-                                    Trim : <span class="example">' X____WATER ( ' -> 'X____WATER ('</span>
-                                </li>
-                                <li>
-                                    Remove underderscores : <span class="example">'X____WATER (' -> 'X&nbsp;&nbsp;&nbsp;&nbsp;WATER ('</span>
-                                </li>
-                                <li>
-                                    Remove double spaces : <span class="example">'X&nbsp;&nbsp;&nbsp;&nbsp;WATER (' -> 'X WATER ('</span>
-                                </li>
-                                <li>
-                                    Remove odd characters at the end. : <span
-                                        class="example"> 'X WATER (' -> 'X WATER '</span>
-                                </li>
-                                <li>
-                                    Trim : <span class="example">'X WATER (' -> 'X WATER'</span>
-                                </li>
-                                <li>
-                                    Word Replacements / Synonyms
-                                </li>
-                            </ol>
-                        </li>
-                        <li>
-                            Tokenize ([space], [(], [.] not followed by number or character) : 'X WATER' ->
-                            <div class="keyword UNDEFINED_ABBR">X</div>
-                            <div class="keyword UNDEFINED_ABBR">WATER</div>
-                        </li>
-                        <li>
-                            Translate
-                        </li>
-                    </ol>
+                    <img src="/content/process_overview.png" width="100%"/>
 
                 </div>
             </div>
@@ -236,7 +202,7 @@ var backgroundColors = [
                     data: {
                         labels: dataLabels,
                         datasets: [{
-                            label: '# of Product Names',
+                            label: '# of results',
                             data: data1,
                             backgroundColor: backgroundColors,
                             borderColor: borderColors,
@@ -268,7 +234,7 @@ $.ajax({
                     data: {
                         labels: dataLabels,
                         datasets: [{
-                            label: '# of Product Names',
+                            label: '# of results',
                             data: data1,
                             backgroundColor: backgroundColors,
                             borderColor: borderColors,

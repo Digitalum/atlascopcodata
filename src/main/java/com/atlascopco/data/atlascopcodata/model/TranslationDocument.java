@@ -163,7 +163,7 @@ public class TranslationDocument {
     })
     @Facet(forField = FACET_PREFIX + "completelyTokenized")
     public String isCompletelyTokenized2() {
-        return !tokens.stream().anyMatch(x -> !Token.TokenType.FIXED_NAME.equals(x.getType()) && !Token.TokenType.WORD.equals(x.getType())) ? "TRUE": "FALSE";
+        return !tokens.stream().anyMatch(x -> !Token.TokenType.FIXED_NAME.equals(x.getType()) && !Token.TokenType.WORD.equals(x.getType())) ? "TOKENIZED": "NOT TOKENIZED";
     }
 
     public String getAttr(String name) {
