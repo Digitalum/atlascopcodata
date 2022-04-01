@@ -18,8 +18,8 @@ public class TokenDto {
     private String code;
     private Token.TokenType type; // UNDEFINED, DEFINED, FIXED
     private List<String> synonyms = new ArrayList<>(); // Replacements
-    private List<SynonymTokenGroupDto> synonymsTokenGroups = new ArrayList<>();
-    private List<SynonymTokenGroupDto> synonymTokenParents = new ArrayList<>();
+    private List<SynonymTokenGroupDto> synonymParents = new ArrayList<>();
+    private List<SynonymTokenGroupDto> synonymGroups = new ArrayList<>();
 
     public TokenDto() {
     }
@@ -39,7 +39,7 @@ public class TokenDto {
         this.count = token.getCount();
         this.synonyms = token.getSynonyms();
         this.documentCount = token.getDocumentCount();
-        this.synonymTokenParents = token.getSynonymParents().stream().map(SynonymTokenGroupDto::new).collect(Collectors.toList());
-        this.synonymsTokenGroups = token.getSynonymGroups().stream().map(SynonymTokenGroupDto::new).collect(Collectors.toList());
+        this.synonymParents = token.getSynonymParents().stream().map(SynonymTokenGroupDto::new).collect(Collectors.toList());
+        this.synonymGroups = token.getSynonymGroups().stream().map(SynonymTokenGroupDto::new).collect(Collectors.toList());
     }
 }

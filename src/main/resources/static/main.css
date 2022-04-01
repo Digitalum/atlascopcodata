@@ -119,3 +119,7 @@ span.addkeyword {
 .keyword i {
     font-size : 8pt;
 }
+
+tfoot {
+    display: table-header-group;
+}

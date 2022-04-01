@@ -76,8 +76,10 @@ public class Token implements Comparable {
 
     @Fields({
             @Field(name = "synonyms", analyze = Analyze.YES),
-            @Field(name = FACET_PREFIX + "synonyms",  analyze = Analyze.NO)
+            @Field(name = FACET_PREFIX + "synonyms",  analyze = Analyze.NO),
+            @Field(name = SORT_PREFIX + "synonyms", index = Index.NO, analyze = Analyze.NO)
     })
+    @SortableField(forField = SORT_PREFIX + "synonyms")
     @FieldBridge(impl = RulesFieldBridge.class)
     @ElementCollection
     @CollectionTable(name = "TokenSynonyms", joinColumns = @JoinColumn(name = "synonymId"))
@@ -89,9 +91,24 @@ public class Token implements Comparable {
     private List<TranslationDocument> documents = new ArrayList<>();
 
 
+
+    @Fields({
+            @Field(name = "synonymParents", analyze = Analyze.YES),
+            @Field(name = FACET_PREFIX + "synonymParents",  analyze = Analyze.NO),
+            @Field(name = SORT_PREFIX + "synonymParents", index = Index.NO, analyze = Analyze.NO)
+    })
+    @SortableField(forField = SORT_PREFIX + "synonymParents")
+    @FieldBridge(impl = SynonymTokenGroupFieldBridge.class)
     @OneToMany(mappedBy="parent" )
     private List<SynonymTokenGroup> synonymParents = new ArrayList<>();
 
+    @Fields({
+            @Field(name = "synonymGroups", analyze = Analyze.YES),
+            @Field(name = FACET_PREFIX + "synonymGroups",  analyze = Analyze.NO),
+            @Field(name = SORT_PREFIX + "synonymGroups", index = Index.NO, analyze = Analyze.NO)
+    })
+    @SortableField(forField = SORT_PREFIX + "synonymGroups")
+    @FieldBridge(impl = SynonymTokenGroupFieldBridge.class)
     @ManyToMany(mappedBy = "tokens")
     private List<SynonymTokenGroup> synonymGroups = new ArrayList<>();
 

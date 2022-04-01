@@ -23,7 +23,9 @@ public class SearchRequest {
 
     private Class<?> entity = TranslationDocument.class;
     private List<FacetFilter> filters = new ArrayList<>();
+    private List<FacetFilter> searchFilters = new ArrayList<>();
     private Map<String,FacetFilter> filterMap = new HashMap<>();
+    private Map<String,FacetFilter> searchFilterMap = new HashMap<>();
     private Map<String,FacetFilter> permissionFilterMap = new HashMap<>();
 
     public Pageable pageable;
@@ -39,6 +41,13 @@ public class SearchRequest {
             filters.add(filterMap.get(field));
         }
         filterMap.get(field).getValues().add(value);
+    }
+    public void addSearchFilter(String field, String value) {
+        if (!searchFilterMap.containsKey(field)) {
+            searchFilterMap.put(field, new FacetFilter(field, new ArrayList<>()));
+            searchFilters.add(searchFilterMap.get(field));
+        }
+        searchFilterMap.get(field).getValues().add(value);
     }
 
     public void addPermissionFilter(String field, String value) {

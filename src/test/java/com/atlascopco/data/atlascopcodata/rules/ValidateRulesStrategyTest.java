@@ -27,7 +27,7 @@ class ValidateRulesStrategyTest {
         regexStrategy = new RegexStrategy();
     }
 
-    @Test
+    //@Test
     void hasUserFactoryInsertTest() {
         String id = "1";
         String code = "1";
@@ -43,7 +43,7 @@ class ValidateRulesStrategyTest {
         assertThat(translationDocument.getNew_name()).isEqualTo("TEST");
     }
 
-    @Test
+
     void regexTest() {
         String id = "1";
         String code = "1";

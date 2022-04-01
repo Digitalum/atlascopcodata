@@ -1,9 +1,8 @@
-
 $(document).ready(function () {
     //set initial state.
     $('#synonymtokenwrapper').hide();
     $('#invertSynonymwrapper').hide();
-    $('#useAsSynonym').prop('checked',false);
+    $('#useAsSynonym').prop('checked', false);
 
     $('#useAsSynonym').change(function () {
         if (this.checked) {
@@ -21,25 +20,52 @@ $(document).ready(function () {
     });
 });
 
+function containsCharacter(value) {
+    var regExp = /[a-zA-Z]/g;
+    return regExp.test(value);
+}
+
+function containsNumber(value) {
+    var regExp = /[0-9]/g;
+    return regExp.test(value);
+}
+
+function confirmToken(tokens, tokenIds, type) {
+    updateToken2(tokens, tokenIds, type, false);
+    saveToken();
+}
+
 function updateToken(tokens, tokenIds, type) {
-    if (type == 'UNDEFINED') {
-        type = 'WORD';
+    updateToken2(tokens, tokenIds, type, true);
+}
+function updateToken2(tokens, tokenIds, type, showPopup) {
+    var value = tokens.join('');
+    var invertSynonym = false;
+        if (containsNumber(value) && containsCharacter(value)) {
+            type = 'FIXED_NAME';
+        } else {
+            type = 'WORD';
+        }
+    if (containsNumber(value) && containsCharacter(value)) {
+        $('#synonymtoken').val(tokens.join(''));
+        invertSynonym = false;
+    } else {
+        $('#synonymtoken').val(tokens.join(' '));
+        invertSynonym = true;
     }
-    if (type == 'UNDEFINED_ABBR') {
-        type = 'FIXED_NAME';
-    }
+
     currentTokens = tokens;
     currentTokenUuids = tokenIds;
     $('#popuptype').val(type);
     if (tokens.length > 1) {
         $('#popuptoken').val('[' + tokens.join('] [') + ']');
-        $('#synonymtoken').val(tokens.join(' '));
-        $('#useAsSynonym').prop('checked', true)
-        $('#invertSynonym').prop('checked', true)
         $('#useAsSynonym').prop("disabled", true);
+        $('#useAsSynonym').prop('checked', true)
+        $('#invertSynonym').prop('checked', invertSynonym)
         $('#invertSynonymwrapper').show();
         $('#synonymtokenwrapper').show();
     } else {
+        $('#synonymtoken').val("");
         $('#popuptoken').val(tokens.join());
         $('#popuptokenUuid').val(tokenIds.join());
         $('#useAsSynonym').prop('checked', false)
@@ -48,7 +74,9 @@ function updateToken(tokens, tokenIds, type) {
         $('#invertSynonymwrapper').show();
         $('#synonymtokenwrapper').show();
     }
-    $('#exampleModalLong').modal('show');
+    if (showPopup) {
+        $('#exampleModalLong').modal('show');
+    }
 }
 
 function saveToken() {
@@ -93,10 +121,12 @@ function saveToken() {
                             console.log(res);
                         },
                         complete: function () {
+                            dataTable.ajax.reload( null, false );
                             $('#spinner-div').hide();//Request is complete so hide spinner
                         }
                     });
                 } else {
+                    dataTable.ajax.reload( null, false );
                     $('#spinner-div').hide();//Request is complete so hide spinner
                 }
             }
@@ -122,9 +152,38 @@ function saveToken() {
                 console.log(res);
             },
             complete: function () {
+                dataTable.ajax.reload( null, false );
                 $('#spinner-div').hide();//Request is complete so hide spinner
             }
         });
         $('#exampleModalLong').modal('hide');
     }
+}
+
+
+function addSearchFunctionality(that) {
+    var api = that.api();
+    // For each column
+    api.columns().eq(0).each(function (colIdx) {
+        // Set the header cell to contain the input element
+        var cell = $('.filters th').eq($(api.column(colIdx).header()).index());
+        var title = $(cell).text();
+        $(cell).html('<input type="text" placeholder="' + title + '" />');
+        // On every keypress in this input
+        $('input', $('.filters th').eq($(api.column(colIdx).header()).index()))
+            .on('keypress keyup', function (e) {
+                e.stopPropagation();
+                // Get the search value
+                $(this).attr('title', $(this).val());
+                var regexr = '{search}'; //$(this).parents('th').find('select').val();
+                var cursorPosition = this.selectionStart;
+                // Search the column for that value
+                let search = api.column(colIdx).search(this.value != '' ? regexr.replace('{search}', this.value) : '', this.value != '', this.value == '');
+
+                if (e.which == 13) {
+                    search.draw();
+                    $(this).focus()[0].setSelectionRange(cursorPosition, cursorPosition);
+                }
+            });
+    });
 }

@@ -64,12 +64,21 @@ public class TokenizeKeywordsStrategy extends CleaningStrategy {
     }
 
     public List<String> extractWords(String value) {
+        /*
+        List<String> split = List.of(value.split(" "));
+        //List<String> split = splitt(split1, "(?<=[^0-9][\\.\\,:)][^0-9])");
+        split = splitt(split, "(?=[^0-9][\\.\\,:)][^0-9])");
+        split = splitt(split, "(?=[^0-9][\\.\\,:)][^0-9])");
+        split = splitt(split, "(?=[\\(])");
+
+        split = split.stream().filter(x -> !x.isBlank()).collect(Collectors.toList());
+*/
+
         List<String> split1 = List.of(value.split("(?<=[ \\.\\,:)])"));
         List<String> split = new ArrayList<>();
         for (String s : split1) {
             split.addAll(List.of(s.split("(?=[\\(])")));
         }
-        split = split.stream().filter(x -> !x.isBlank()).collect(Collectors.toList());
 
         List<String> result = new ArrayList<>();
         String rejoinString = "";
@@ -90,6 +99,14 @@ public class TokenizeKeywordsStrategy extends CleaningStrategy {
         }
 
         return result;
+    }
+
+    private List<String> splitt(List<String> split1, String regex) {
+        List<String> split = new ArrayList<>();
+        for (String s : split1) {
+            split.addAll(List.of(s.split(regex)));
+        }
+        return split;
     }
 
     private int countCharacters(String value) {

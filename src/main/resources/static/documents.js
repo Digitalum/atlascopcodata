@@ -1,3 +1,7 @@
+var dataTable;
+
+
+
 $(document).ready(function () {
     var token = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1);
 
@@ -5,7 +9,12 @@ $(document).ready(function () {
         token = "";
     }
 
-    $('#documentstable').DataTable({
+    $('#documentstable thead tr')
+        .clone(true)
+        .addClass('filters')
+        .appendTo('#documentstable thead');
+
+    dataTable = $('#documentstable').DataTable({
         iDisplayLength: 25,
         lengthMenu: [[10, 25, 50, 100, 250, 1000], [10, 25, 50, 100, 250, 1000]],
         processing: true,
@@ -21,7 +30,6 @@ $(document).ready(function () {
             contentType: "application/json",
             dataFilter: function (data) {
                 var json = jQuery.parseJSON(data);
-                console.log(json.page.totalElements);
                 json.recordsTotal = json.page.totalElements;
                 json.recordsFiltered = json.page.totalElements;
                 json.data = json.page.content;
@@ -31,34 +39,7 @@ $(document).ready(function () {
                 return JSON.stringify(d);
             }
         },
-
-        "columns": [
-            {"data": "code"},
-            {
-                "data": "original_name",
-                render: function (originalname, type, row) {
-                    return '<span onclick="updateDoc(\'' + encodeURI(originalname) + '\' , \'' + row.code + '\')" > ' + originalname + '</span>';
-                }
-            },
-            {"data": "new_name"},
-            {
-                "data": "tokens",
-                render: function (tokens, type) {
-                    var a = "";
-                    $(tokens).each(function (index, token) {
-                        a += '<div class="keyword ' + token.type + '"><a href="/tokens/detail/' + token.uuid + '">' + token.code + '</a>' +
-                            '<span class="addkeyword" uuid="' + token.uuid + '" onclick="updateToken([\'' + token.code + '\'],[\'' + token.uuid + '\'], \'' + token.type + '\')"> <i class="fa-solid fa-pen"></i></span> </div>';
-                    });
-
-                    return a;
-                }
-            },
-            {"data": "newNameTranslated"},
-            {"data": "completelyTokenized"},
-            {"data": "category"},
-            {"data": "brand"},
-            {"data": "changes"}],
-
+        "columns": getColumns(),
         columnDefs: [{
             targets: 4,
             createdCell: function (td, cellData, rowData, row, col) {
@@ -70,9 +51,12 @@ $(document).ready(function () {
         }],
         "drawCallback": function (settings) {
             reloadDragg();
-        }
+        },
+        initComplete: function () {
+            addSearchFunctionality(this);
+        },
+    });
 
-    })
 });
 
 function reloadDragg() {
@@ -137,9 +121,6 @@ function updateDoc(value, productCode) {
 
 
 
-
-
-
 function saveDocument() {
     $('#spinner-div').show();
     $.ajax({
@@ -155,9 +136,42 @@ function saveDocument() {
             console.log(res);
         },
         complete: function () {
+
+            dataTable.ajax.reload( null, false );
             $('#spinner-div').hide();//Request is complete so hide spinner
         }
     });
     $('#documentModel').modal('hide');
 
+}
+
+function getColumns() {
+    return [
+        {"data": "code"},
+        {
+            "data": "original_name",
+            render: function (originalname, type, row) {
+                return '<span onclick="updateDoc(\'' + encodeURI(originalname) + '\' , \'' + row.code + '\')" > ' + originalname + '</span>';
+            }
+        },
+        {"data": "new_name"},
+        {
+            "data": "tokens",
+            render: function (tokens, type) {
+                var a = "";
+                $(tokens).each(function (index, token) {
+                    a += '<div class="keyword ' + token.type + '"><a href="/tokens/detail/' + token.uuid + '">' + token.code + '</a>' +
+                        '<span class="addkeyword" uuid="' + token.uuid + '" onclick="updateToken([\'' + token.code + '\'],[\'' + token.uuid + '\'], \'' + token.type + '\')"> <i class="fa-solid fa-pen"></i></span> ' +
+                        '<span class="addkeyword" uuid="' + token.uuid + '" onclick="confirmToken([\'' + token.code + '\'],[\'' + token.uuid + '\'], \'' + token.type + '\')"> <i class="fa-solid fa-check-double"></i></span> ' +
+                        '</div>';
+                });
+
+                return a;
+            }
+        },
+        {"data": "newNameTranslated"},
+        {"data": "completelyTokenized"},
+        {"data": "category"},
+        {"data": "brand"},
+        {"data": "changes"}];
 }

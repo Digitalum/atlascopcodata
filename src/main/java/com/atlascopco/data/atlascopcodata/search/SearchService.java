@@ -41,7 +41,7 @@ public class SearchService implements ApplicationListener<ApplicationReadyEvent>
 
     private final EntityManager entityManager;
 
-    @Value("${ccp.lucene.index.on.startup:true}")
+    @Value("${ccp.lucene.index.on.startup:false}")
     private boolean luceneIndexOnstartUp;
 
     @Autowired
@@ -59,10 +59,20 @@ public class SearchService implements ApplicationListener<ApplicationReadyEvent>
         BooleanJunction bool = queryBuilder.bool().must(queryBuilder.all().createQuery());
         bool = addFreeTextSearch(request, queryBuilder, bool);
 
+
         for (SearchRequest.FacetFilter filter : request.getFilters()) {
             BooleanJunction bool2 = queryBuilder.bool().minimumShouldMatchNumber(1);
             for (String value : filter.getValues()) {
                 Query categoryQuery = queryBuilder.keyword().wildcard().onField("facet-" + filter.getFacetName()).matching(value.toLowerCase()).createQuery();
+                bool2 = bool2.should(categoryQuery);
+            }
+            bool = bool.must(bool2.createQuery());
+        }
+
+        for (SearchRequest.FacetFilter filter : request.getSearchFilters()) {
+            BooleanJunction bool2 = queryBuilder.bool().minimumShouldMatchNumber(1);
+            for (String value : filter.getValues()) {
+                Query categoryQuery = queryBuilder.simpleQueryString().onField( filter.getFacetName()).boostedTo(2f).matching(value).createQuery();
                 bool2 = bool2.should(categoryQuery);
             }
             bool = bool.must(bool2.createQuery());

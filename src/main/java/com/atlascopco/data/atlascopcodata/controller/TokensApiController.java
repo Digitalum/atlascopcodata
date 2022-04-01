@@ -4,7 +4,6 @@
 package com.atlascopco.data.atlascopcodata.controller;
 
 import com.atlascopco.data.atlascopcodata.controller.paging.Paged;
-import com.atlascopco.data.atlascopcodata.controller.paging.datatable.Order;
 import com.atlascopco.data.atlascopcodata.controller.paging.datatable.PagingRequest;
 import com.atlascopco.data.atlascopcodata.dao.SynonymTokenRepository;
 import com.atlascopco.data.atlascopcodata.dao.TokenRepository;
@@ -19,8 +18,6 @@ import com.atlascopco.data.atlascopcodata.search.DefaultTokenService;
 import com.atlascopco.data.atlascopcodata.search.search.SearchFacet;
 import com.atlascopco.data.atlascopcodata.search.search.SearchRequest;
 import com.atlascopco.data.atlascopcodata.services.DefaultCleansingService;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.search.query.facet.Facet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -52,21 +49,7 @@ public class TokensApiController {
     public @ResponseBody
     Paged<TokenDto> getTokensPost(
             @RequestBody PagingRequest pagingRequest) {
-        final int size = pagingRequest.getLength();
-        final int pageNumber = pagingRequest.getStart() / size;
-
-        Sort.Order defaultOrder = new Sort.Order(Sort.Direction.DESC, "documentCount");
-        for (Order order : pagingRequest.getOrder()) {
-            final String fieldName = pagingRequest.getColumns().get(order.getColumn()).getData();
-            defaultOrder = new Sort.Order(Sort.Direction.fromString(order.getDir().toString()), fieldName);
-        }
-        SearchRequest searchRequest = new SearchRequest();
-        searchRequest.setPageable(PageRequest.of(pageNumber, size, Sort.by(defaultOrder)));
-        searchRequest.setEntity(Token.class);
-
-        if (StringUtils.isNotEmpty(pagingRequest.getSearch().getValue())) {
-            searchRequest.setQuery(pagingRequest.getSearch().getValue());
-        }
+        SearchRequest searchRequest = SearchHelper.createSearchRequest(pagingRequest, Token.class, "documentCount");
 
         return tokenService.getPagedTokens(searchRequest);
     }
@@ -114,7 +97,6 @@ public class TokensApiController {
 
             synonymTokenRepository.deleteAll(token1.getSynonymParents());
             synonymTokenRepository.deleteAll(token1.getSynonymGroups());
-
 
 
             cleansingService.executeCleaningRules(documentsForKeyword);

@@ -118,6 +118,12 @@ public class TranslationDocument {
         tokens.removeAll(tokens);
     }
 
+    @Fields({
+            @Field(name = "changes", analyze = Analyze.NO),
+            @Field(name = FACET_PREFIX + "changes", analyze = Analyze.NO),
+            @Field(name = SORT_PREFIX + "changes", index = Index.NO, analyze = Analyze.NO)
+    })
+    @SortableField(forField = SORT_PREFIX + "changes")
     @FieldBridge(impl = RulesFieldBridge.class)
     @ElementCollection
     @CollectionTable(name = "rules", joinColumns = @JoinColumn(name = "change_id"))

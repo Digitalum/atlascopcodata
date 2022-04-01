@@ -1,51 +1,44 @@
-<!DOCTYPE HTML>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8"/>
-    <title>Spring Boot Thymeleaf Application - Bootstrap Pagination</title>
-
-    <div th:insert="fragments/headerInclude"></div>
-    <link rel="stylesheet" href="/content/main.css"/>
-</head>
-<body>
-
-<!-- Navigation -->
-<div th:insert="fragments/header :: #header"></div>
-
-<div class="container" style="max-width: 100%;font-size:9pt">
+<h2>
+    Products
+</h2>
+<div class="container" style="width: 100%;max-width: 100%">
     <div class="row">
         <div class="col-lg-10 mt-5 mb-5">
-            <table id="tokenstable" class="table table-bordered table-responsive-sm table-sm">
+
+            <table id="documentstable" class="table table-bordered table-responsive-sm table-sm" style="font-size: 9pt">
                 <thead>
                 <tr>
-                    <th>Token </th>
-                    <th>Usage Count</th>
-                    <th>Type</th>
-                    <th>Word Replacements</th>
-                    <th>Token Synonyms</th>
-                    <th>Used in Token Synonym</th>
+                    <th>Code</th>
+                    <th>Original Text</th>
+                    <th>New Text</th>
+                    <th>Tokens</th>
+                    <th>Translated</th>
+                    <th>Ready</th>
+                    <th>Category</th>
+                    <th>Brand</th>
+                    <th>Changes</th>
                 </tr>
                 </thead>
                 <tfoot>
                 <tr>
-                    <th>Input Token </th>
-                    <th>Input Usage Count</th>
-                    <th>Input Type</th>
-                    <th>Input Word Replacements</th>
-                    <th>Input Token Synonyms</th>
-                    <th>Input Used in Token Synonym</th>
+                    <th>Input Code</th>
+                    <th>Input Original Text</th>
+                    <th>Input New Text</th>
+                    <th>Input Tokens</th>
+                    <th>Input Translated</th>
+                    <th>Input Ready</th>
+                    <th>Input Category</th>
+                    <th>Input Brand</th>
+                    <th>Input Changes</th>
                 </tr>
                 </tfoot>
                 <tbody>
 
                 </tbody>
             </table>
-
         </div>
     </div>
 </div>
-
-
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
@@ -91,7 +84,8 @@
                         <label for="popuptype">Include Inverted Synonym</label>
                         <div class="input-group-prepend">
                             <div class="input-group-text">
-                                <input type="checkbox" id="invertSynonym" aria-label="Checkbox for following text input">
+                                <input type="checkbox" id="invertSynonym"
+                                       aria-label="Checkbox for following text input">
                             </div>
                         </div>
                     </div>
@@ -105,11 +99,32 @@
     </div>
 </div>
 
-
-<div th:insert="fragments/footer"></div>
-
-<script src="/content/main.js"></script>
-<script src="/content/tokens.js"></script>
-
-</body>
-</html>
+<div class="modal fade" id="documentModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="documentModel1">Edit Original Text</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="popuptoken">Product</label>
+                        <input type="text" disabled="disabled" class="form-control" id="productcode"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="popuptoken">Original Name</label>
+                        <input type="text" class="form-control" id="originalname"/>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveDocument()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
