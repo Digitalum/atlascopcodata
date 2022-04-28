@@ -38,12 +38,15 @@ public class DefaultExcelService {
     private TokenTranslationRepository tokenTranslationRepository;
 
 
-    public void exportTokens(List<Token> list) throws Exception {
+    public File exportTokens(List<Token> list) throws Exception {
         System.out.println("-------------RUN-------------------------------\n");
         Workbook workbook = new XSSFWorkbook();
 
         createSheet(list, workbook, Token.TokenType.WORD);
         createSheet(list, workbook, Token.TokenType.FIXED_NAME);
+        createSheet(list, workbook, Token.TokenType.UNDEFINED);
+        createSheet(list, workbook, Token.TokenType.UNDEFINED_ABBR);
+        createSheet(list, workbook, Token.TokenType.WORD_NOT_TRANSLATABLE);
 
         File currDir = new File(".");
         String path = currDir.getAbsolutePath();
@@ -53,6 +56,8 @@ public class DefaultExcelService {
         FileOutputStream outputStream = new FileOutputStream(fileLocation);
         workbook.write(outputStream);
         workbook.close();
+
+        return new File(fileLocation);
     }
 
     private void createSheet(List<Token> list, Workbook workbook, Token.TokenType tokenType) {
@@ -114,7 +119,7 @@ public class DefaultExcelService {
         return headerCell;
     }
 
-    public void exportDocuments(List<TranslationDocument> list) throws Exception {
+    public File exportDocuments(List<TranslationDocument> list) throws Exception {
 
         System.out.println("-------------RUN-------------------------------\n");
         Workbook workbook = new XSSFWorkbook();
@@ -127,12 +132,12 @@ public class DefaultExcelService {
 
         CellStyle headerStyle = workbook.createCellStyle();
         //headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
-        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        //headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         XSSFFont font = ((XSSFWorkbook) workbook).createFont();
         font.setFontName("Arial");
         font.setFontHeightInPoints((short) 16);
-        font.setBold(true);
+        //font.setBold(true);
         headerStyle.setFont(font);
 
         Cell headerCell = header.createCell(0);
@@ -199,6 +204,8 @@ public class DefaultExcelService {
         FileOutputStream outputStream = new FileOutputStream(fileLocation);
         workbook.write(outputStream);
         workbook.close();
+
+        return new File(fileLocation);
     }
 
     private String translate(String value, Map<String, String> m) {
@@ -218,6 +225,7 @@ public class DefaultExcelService {
     public void importTokensExcel(InputStream inputStream) throws IOException {
         //synonymTokenRepository.deleteAll();
         //tokenRepository.deleteAll();
+        //tokenTranslationRepository.deleteAll();
         Workbook workbook = new XSSFWorkbook(inputStream);
 
         importTokens(workbook);

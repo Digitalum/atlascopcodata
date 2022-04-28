@@ -74,11 +74,12 @@ public class TokenizeKeywordsStrategy extends CleaningStrategy {
         split = split.stream().filter(x -> !x.isBlank()).collect(Collectors.toList());
 */
 
-        List<String> split1 = List.of(value.split("(?<=[ \\.\\,:)])"));
+        List<String> split1 = List.of(value.split("(?<=[ ])"));
         List<String> split = new ArrayList<>();
         for (String s : split1) {
             split.addAll(List.of(s.split("(?=[\\(])")));
         }
+        split.remove( " ");
 
         List<String> result = new ArrayList<>();
         String rejoinString = "";

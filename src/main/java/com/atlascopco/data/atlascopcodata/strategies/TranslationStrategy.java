@@ -3,6 +3,7 @@
  */
 package com.atlascopco.data.atlascopcodata.strategies;
 
+import com.atlascopco.data.atlascopcodata.dao.TokenRepository;
 import com.atlascopco.data.atlascopcodata.dao.TokenTranslationRepository;
 import com.atlascopco.data.atlascopcodata.dao.TranslationDocumentRepository;
 import com.atlascopco.data.atlascopcodata.model.TokenTranslation;
@@ -23,6 +24,8 @@ public class TranslationStrategy extends CleaningStrategy {
     private TokenTranslationRepository tokenTranslationRepository;
     @Autowired
     private TranslationDocumentRepository translationDocumentRepository;
+    @Autowired
+    private TokenRepository tokenRepository;
 
     @Override
     public boolean isApplicable(DataRuleDto type) {
@@ -34,8 +37,8 @@ public class TranslationStrategy extends CleaningStrategy {
     public Map<String, Object> createContext(Map<String, Object> ctx, DataRuleDto ruleRule) {
         final Map<String, Object> context = super.createContext(ctx, ruleRule);
 
-        final Map<String, String> tokenTranslations = tokenTranslationRepository.findAll().stream()
-                .filter(x -> "nl".equals(x.getKey().getLanguage()))
+        final Map<String, String> tokenTranslations = tokenTranslationRepository.findAllByKeyLanguage("nl").stream()
+                //.filter(x -> "nl".equals(x.getKey().getLanguage()))
                 .collect(Collectors.toMap(x -> x.getKey().getTokenCode(), TokenTranslation::getValue));
         Map<String, Map<String, String>> tranMap = new HashMap<>();
         tranMap.put("nl", tokenTranslations);

@@ -257,19 +257,40 @@ $.ajax({
         });
         $('#spinner-div').hide()
         if (response.status == 200) {
-            alert("Clean data successfully.");
+            alert("Translate data successfully.");
         }
     }
 
-    async function exporttokens() {
+    function exporttokens() {
         $('#spinner-div').show();
-        let response = await fetch('/tokens/export', {
-            method: "POST"
-        });
-        $('#spinner-div').hide()
-        if (response.status == 200) {
-            alert("Clean data successfully.");
-        }
+        var fileName = 'tokens.xlsx';
+
+        var request = new XMLHttpRequest();
+        request.open('POST', '/tokens/export', true);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        request.responseType = 'blob';
+
+        request.onload = function(e) {
+            if (this.status === 200) {
+                var blob = this.response;
+                if(window.navigator.msSaveOrOpenBlob) {
+                    window.navigator.msSaveBlob(blob, fileName);
+                }
+                else{
+                    var downloadLink = window.document.createElement('a');
+                    var contentTypeHeader = request.getResponseHeader("Content-Type");
+                    downloadLink.href = window.URL.createObjectURL(new Blob([blob], { type: contentTypeHeader }));
+                    downloadLink.download = fileName;
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                }
+            }
+
+            $('#spinner-div').hide()
+        };
+        request.send();
+
     }
 
     async function importTokens() {
@@ -288,14 +309,33 @@ $.ajax({
 
     async function exportexcel() {
         $('#spinner-div').show();
-        let response = await fetch('/download', {
-            method: "POST"
-        });
-        $('#spinner-div').hide()
-        if (response.status == 200) {
-            alert("Export data successfully.");
-        }
+        var fileName = 'products.xlsx';
 
+        var request = new XMLHttpRequest();
+        request.open('POST', '/download', true);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        request.responseType = 'blob';
+
+        request.onload = function(e) {
+            if (this.status === 200) {
+                var blob = this.response;
+                if(window.navigator.msSaveOrOpenBlob) {
+                    window.navigator.msSaveBlob(blob, fileName);
+                }
+                else{
+                    var downloadLink = window.document.createElement('a');
+                    var contentTypeHeader = request.getResponseHeader("Content-Type");
+                    downloadLink.href = window.URL.createObjectURL(new Blob([blob], { type: contentTypeHeader }));
+                    downloadLink.download = fileName;
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                }
+            }
+
+            $('#spinner-div').hide()
+        };
+        request.send();
     }
 </script>
 

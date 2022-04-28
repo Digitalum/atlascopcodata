@@ -16,4 +16,5 @@ public interface TokenTranslationRepository extends JpaRepository<TokenTranslati
 
     Optional<TokenTranslation> findByKey(TokenTranslation.Key key);
 
+    List<TokenTranslation> findAllByKeyLanguage(String language);
 }

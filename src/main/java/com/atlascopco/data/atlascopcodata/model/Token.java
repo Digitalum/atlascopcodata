@@ -151,6 +151,6 @@ public class Token implements Comparable {
 
     @Override
     public String toString() {
-        return String.valueOf(this.code);
+        return String.valueOf(this.code + " - " + this.type + " - " + this.uuid);
     }
 }

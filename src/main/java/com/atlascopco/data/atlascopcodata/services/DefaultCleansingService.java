@@ -3,6 +3,7 @@
  */
 package com.atlascopco.data.atlascopcodata.services;
 
+import com.atlascopco.data.atlascopcodata.dao.TokenRepository;
 import com.atlascopco.data.atlascopcodata.dao.TranslationDocumentRepository;
 import com.atlascopco.data.atlascopcodata.dto.KeywordDto;
 import com.atlascopco.data.atlascopcodata.dto.SynonymDto;
@@ -32,6 +33,8 @@ public class DefaultCleansingService {
     private List<CleaningStrategy> cleaningStrategies;
     @Autowired
     private TranslationDocumentRepository translationDocumentRepository;
+    @Autowired
+    private TokenRepository tokenRepository;
     @PersistenceContext
     private EntityManager entityManager;
 

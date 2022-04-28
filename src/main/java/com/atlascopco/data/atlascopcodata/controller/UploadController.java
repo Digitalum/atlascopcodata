@@ -9,7 +9,10 @@ import com.atlascopco.data.atlascopcodata.services.DefaultExcelService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 @Log4j2
@@ -48,16 +52,28 @@ public class UploadController {
     }
 
     @PostMapping("/download")
-    public ResponseEntity<?> download() throws Exception {
-        excelService.exportDocuments(documentService.getAllDocuments());
-        return ResponseEntity.ok("File uploaded successfully.");
+    public ResponseEntity<Resource> download() throws Exception {
+        File file = excelService.exportDocuments(documentService.getAllDocuments());
+
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+        return ResponseEntity.ok()
+               // .headers(headers)
+                .contentLength(file.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 
 
     @PostMapping("/tokens/export")
-    public ResponseEntity<?> exportTokens() throws Exception {
-        excelService.exportTokens(tokenService.getAllTokens());
-        return ResponseEntity.ok("File uploaded successfully.");
+    public ResponseEntity<Resource> exportTokens() throws Exception {
+        final File file = excelService.exportTokens(tokenService.getAllTokens());
+
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+        return ResponseEntity.ok()
+                // .headers(headers)
+                .contentLength(file.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 
     @PostMapping("/tokens2/import")

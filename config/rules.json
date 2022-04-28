@@ -26,7 +26,7 @@
       {
         "code": "remove_ending",
         "name": "Remove endings like '(', '-'",
-        "trigger": "true",
+        "trigger": "false",
         "strategy": "REGEX",
         "regex": "value.replaceAll('[-]$', ' ')"
       },
@@ -59,7 +59,7 @@
         ]
       },
       {
-        "code": "Synonum Token",
+        "code": "Synonym Token",
         "trigger": "true",
         "strategy": "SYNONYM_TOKEN",
         "files": []

@@ -19,6 +19,8 @@ $(document).ready(function () {
         lengthMenu: [[10, 25, 50, 100, 250, 1000], [10, 25, 50, 100, 250, 1000]],
         processing: true,
         serverSide: true,
+        orderCellsTop: true,
+        fixedHeader: true,
         search: {
             return: true
         },

@@ -21,6 +21,7 @@ public class TokenTranslation {
     @Column
     private String value;
 
+
     public TokenTranslation() {
 
     }
